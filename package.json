@@ -37,6 +37,7 @@
 	"type": "module",
 	"dependencies": {
 		"@internationalized/date": "^3.5.1",
+		"@sveltejs/adapter-vercel": "^5.0.0",
 		"bits-ui": "^0.14.0",
 		"clsx": "^2.1.0",
 		"mode-watcher": "^0.1.2",
