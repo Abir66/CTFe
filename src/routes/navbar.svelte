@@ -28,7 +28,7 @@
 		  {showMenu ? 'flex' : 'hidden'}"
 			>
 				<div class="flex flex-col space-y-5 md:ml-10 md:flex-row md:space-x-5  md:space-y-0 }">
-					<a href="/home">Contests</a>
+					<a href={`/contests?hell=${"lara"}`}>Contests</a>
 					<a href="/blog">Problems</a>
 					<a href="/about">Blogs</a>
 				</div>
