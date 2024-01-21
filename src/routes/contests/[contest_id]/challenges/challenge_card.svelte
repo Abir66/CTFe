@@ -18,10 +18,16 @@
 
 		if (result.type === 'loaded' && result.status === 200) {
 			pushState(href, { selected: result.data });
-			ChallengeDialogueOpen = true;
+			// ChallengeDialogueOpen = true;
 		} else {
 			goto(href);
 		}
+	}
+
+	$: if ($page.state.selected) {
+		ChallengeDialogueOpen = true;
+	} else {
+		ChallengeDialogueOpen = false;
 	}
 </script>
 
@@ -36,7 +42,7 @@
 		}}
 	>
 		<Dialog.Content>
-			<ChallengeModal />
+			<ChallengeModal data={$page.state.selected} />
 		</Dialog.Content>
 	</Dialog.Root>
 {/if}
