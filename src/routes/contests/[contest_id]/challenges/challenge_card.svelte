@@ -17,14 +17,14 @@
 		const result = await preloadData(href);
 
 		if (result.type === 'loaded' && result.status === 200) {
-			pushState(href, { selected: result.data });
+			pushState(href, { modalData: result.data });
 			// ChallengeDialogueOpen = true;
 		} else {
 			goto(href);
 		}
 	}
 
-	$: if ($page.state.selected) {
+	$: if ($page.state.modalData) {
 		ChallengeDialogueOpen = true;
 	} else {
 		ChallengeDialogueOpen = false;
@@ -42,13 +42,13 @@
 		}}
 	>
 		<Dialog.Content>
-			<ChallengeModal data={$page.state.selected} />
+			<ChallengeModal data={$page.state.modalData} />
 		</Dialog.Content>
 	</Dialog.Root>
 {/if}
 
 <Card.Root
-	class="h-25 flex w-full flex-col items-center space-y-2 border-4 border-black bg-primary p-3 align-middle text-secondary sm:w-1/3 md:w-1/4 lg:w-1/5 {challenge.status ==
+	class="h-25 flex w-full flex-col items-center space-y-2 border-4  hover:scale-105 border-black bg-primary p-3 align-middle text-secondary sm:w-1/3 md:w-1/4 lg:w-1/5 {challenge.status ==
 	'solved'
 		? ' bg-green-500 text-black'
 		: ''}"

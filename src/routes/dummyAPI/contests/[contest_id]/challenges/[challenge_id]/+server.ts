@@ -25,6 +25,6 @@ import { json } from '@sveltejs/kit';
 
 
 export function GET({params}) {
-    console.log(params.challenge_id);
+    // console.log(params.challenge_id);
     return json(data);
 }

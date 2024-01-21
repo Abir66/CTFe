@@ -1,7 +1,12 @@
 <script lang="ts">
 	import SvelteMarkdown from 'svelte-markdown';
 	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { superForm } from 'sveltekit-superforms/client';
 	export let data;
+	const { form, errors, constraints, enhance } = superForm(data.form);
+	
     $: ({challenge } = data);
 	
 </script>
@@ -35,5 +40,24 @@
         <div class="text-center">
             <p class="text-xl ">{challenge.attempted}/{challenge.max_attempts} Attemps</p>
         </div>
+
+		<form method="POST" use:enhance action="?/submitFlag" class="flex w-full gap-x-5" >
+
+			<div class="w-3/4">
+				<Input class="border-primary"
+					type="text"
+					name="flag"
+					aria-invalid={$errors.flag ? 'true' : undefined}
+					placeholder="Flag"
+					bind:value={$form.flag}
+					{...$constraints.flag}
+				/>
+				{#if $errors.flag}<span class="invalid">{$errors.flag}</span>{/if}
+			</div>
+
+			<Button class="w-1/4" type="submit">Sign in</Button>
+		</form>
+
+
 	</div>
 </div>
