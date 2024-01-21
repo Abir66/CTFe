@@ -5,9 +5,9 @@
     console.log(data.upcoming);   
 </script>
 
-<div class="flex flex-row" >
+<div class="lg:flex  flex-row lg:space-x-24" >
 
-   <div class="basis-3/4">
+   <div class="basis-3/4 ">
     {#if data.current.length > 0}
     <div class="Container" >
        <div class="title">
@@ -91,7 +91,7 @@
     </div>
 
    
-   <div class="basis-1/4 filter" >
+   <div class="basis-1/4  filter sm:mx-24 " >
       <Filter/>
    </div>
 
@@ -125,6 +125,6 @@
     }
     .filter{
         margin-top: 5rem;
-        margin-left: 10rem;
+        
     }
 </style>
