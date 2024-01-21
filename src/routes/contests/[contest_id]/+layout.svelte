@@ -33,8 +33,8 @@
 
 <style>
     .active{
-        color:#d91b42;
-        border-bottom: 2px solid #d91b42;
+       
+        border-bottom: 2px solid black;
         padding-bottom: 8px;
     }
     .section{
