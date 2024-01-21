@@ -1,9 +1,9 @@
 <script>
     export let data = [];
     let isOpen = false;
-    let items = ["Item 1", "Item 2", "Item 3"];
-    let buttonText = "Dropdown";
     let catagories = ["cryptograpgy","OSINT","steganography","web","forensics"];
+    let buttonText = "Select Catagory";
+    let filter_catagories = [];
 
     function changeButtonText(selectedItem) {
         buttonText = selectedItem;
@@ -11,10 +11,27 @@
     }
 
     function addCatagory() {
+        if(buttonText == "Dropdown") {
+            return;
+        }
         let newCatagory = buttonText;
-        catagories.push(newCatagory);
-        buttonText = "Dropdown";
+        filter_catagories.push(newCatagory);
+        filter_catagories = filter_catagories;
+        const index = catagories.indexOf(newCatagory);
+        catagories.splice(index, 1);
+        catagories = catagories;
+        buttonText = "Select Catagory";
     }
+
+    function removeCatagory(catagory){
+        const index = filter_catagories.indexOf(catagory);
+        filter_catagories.splice(index, 1);
+        filter_catagories = filter_catagories;
+        catagories.push(catagory);
+        catagories = catagories;
+    
+    }
+
 </script>
 
 <h1 class="mb-2 text-3xl font-bold leading-none tracking-tight text-gray-900  dark:text-white">Problems</h1>
@@ -24,7 +41,7 @@
 </div>
 
 <div class="float-right p-4  w-1/4">
-    <form class="block max-w-sm p-6 border-2 border-black dark:border-gray-700 ">
+    <form class="max-w-sm p-6 border-2 border-black dark:border-gray-700 ">
             <label for="default-search" class="mb-2 text-xs font-medium text-gray-900 sr-only dark:text-white">Search</label>
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -46,7 +63,7 @@
                 </div>
                 {#if isOpen}
                   <div class="absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
-                    {#each items as item (item)}
+                    {#each catagories as item (item)}
                     <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white" on:click={() => changeButtonText(item)}>
                         {item}
                     </a>
@@ -54,18 +71,24 @@
                   </div>
                 {/if}
             </div>
-            <div class="flex">
-                <div class="py-1 mt-2">
-                    {#each catagories as catagory(catagory)}
-                        <a href="#" class="border border-black dark:border-gray-700 px-1 py-1 text-gray-800 rounded-lg ">
-                            {catagory}
-                            <button>x</button>
-                        </a>
-                    {/each}
-                  </div>
+            <div class="">
+                <div class="flex" >
+                    <div class="py-1 mt-2 items-center flex-wrap">
+                        {#each filter_catagories as catagory, index (catagory)}
+                            <div class="text-center inline-block text-white bg-blue-500 px-1 m-0.5 text-gray-800 rounded-lg ">
+                                {catagory}
+                                <button class="w-5 h-5 float-right rounded-lg" on:click={() => removeCatagory(catagory)}>x</button>
+                            </div>
+                        {/each}
+                      </div>
+                </div>
+                
+                  <div class="px-2  text-center py-1 w-1/2 bg-sky-700 shadow-sm text-white">Apply Filter</div>
+
             </div>
-    
+            
         </form> 
+        
 </div>
    
 
