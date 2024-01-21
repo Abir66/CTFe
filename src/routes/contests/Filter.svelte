@@ -1,4 +1,6 @@
 <script>
+	 import { goto } from '$app/navigation';
+
   
 	let status = ['all'];
 	console.log(status);
@@ -6,8 +8,21 @@
     let type = ['all'];
   
     const Filter = () => {
-        console.log(status);
-        console.log(type);
+        
+        let url = '/contests?';
+        if(search != '')
+        {
+            url += `search=${search}&`;
+        }
+        if(status.length > 0)
+        {
+            url += `status=${status.join('&status=')}&`;
+        }
+        if(type.length > 0)
+        {
+            url += `type=${type.join(',')}&`;
+        }
+        goto(url);
     }
     let search = '';
 
@@ -26,20 +41,20 @@
         </div>
         <div class="content">
             <label>
-                <input type="checkbox" bind:group={status} value="Current" />
+                <input type="checkbox" bind:group={status} value="current" />
                 Current Contests
             </label>
         </div>
         <div class="content">
             <label>
-                <input type="checkbox" bind:group={status} value="Upcoming" />
+                <input type="checkbox" bind:group={status} value="upcoming" />
                 Upcoming Contests
             </label>
         </div>
     
         <div class="content">
             <label>
-                <input type="checkbox" bind:group={status} value="Past" />
+                <input type="checkbox" bind:group={status} value="past" />
                 Past Contests
             </label>
         </div>
