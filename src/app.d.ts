@@ -6,7 +6,7 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		interface PageState {
-			modalData: any;
+			modalData: any,
 		}
 		// interface Platform {}
 	}
