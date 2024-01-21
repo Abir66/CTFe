@@ -40,11 +40,9 @@ const data= {
     ]
 }
 
+import { json } from '@sveltejs/kit';
 
 export function GET(){
-    return new Response(JSON.stringify(data), {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+   
+   return json(data);
 }
