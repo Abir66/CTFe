@@ -34,14 +34,17 @@
 		const result = await preloadData(href);
 
 		if (result.type === 'loaded' && result.status === 200) {
-			pushState(href, { modalData: result.data });
+			pushState(href, { 
+				data : result.data,
+				path : href
+			 });
 			// ChallengeDialogueOpen = true;
 		} else {
 			goto(href);
 		}
 	}
 
-	$: if ($page.state.modalData) {
+	$: if ($page.state.data) {
 		modalOpen = true;
 	} else {
 		modalOpen = false;
@@ -62,9 +65,9 @@
 	>
 		<Dialog.Content>
 			{#if modalDest === '/login'}
-				<Login data={$page.state.modalData} />
+				<Login data={$page.state.data} />
 			{:else if modalDest === '/register'}
-				<Register data={$page.state.modalData} />
+				<Register data={$page.state.data} />
 			{/if}
 		</Dialog.Content>
 	</Dialog.Root>

@@ -5,7 +5,7 @@
 
 	export let data; // : PageData
 
-	const { form, errors, constraints } = superForm(data.form);
+	const { form, errors, constraints, enhance, formId } = superForm(data.form);
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
@@ -21,8 +21,8 @@
 	</div>
 	<!-- <UserAuthForm /> -->
 
-	<form method="POST" class="flex flex-col gap-y-5">
-
+	<form use:enhance method="POST" class="flex flex-col gap-y-5">
+		<input type="hidden" name="__superform_id" bind:value={$formId} />
 		<div class="form-input">
 			<Label for="email">E-mail</Label>
 			<Input
