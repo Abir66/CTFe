@@ -3,18 +3,23 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+
 	import { superForm } from 'sveltekit-superforms/client';
+	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
+
 	export let data;
-	const { form, errors, constraints, enhance } = superForm(data.form);
+
+	const { form, errors, constraints, enhance, formId } = superForm(data.form);
 	
     $: ({challenge } = data);
-	
+
 </script>
 
+{#if challenge}
 <div class="flex min-w-0 flex-col items-center p-5">
 	<div class="text-center">
-		<h1 class="text-2xl font-bold">{data.challenge.name}</h1>
-		<h2 class="text-2xl">{data.challenge.score}</h2>
+		<h1 class="text-2xl font-bold">{challenge.name}</h1>
+		<h2 class="text-2xl">{challenge.score}</h2>
 	</div>
 
 	<div class="flex flex-col space-y-5">
@@ -41,23 +46,26 @@
             <p class="text-xl ">{challenge.attempted}/{challenge.max_attempts} Attemps</p>
         </div>
 
-		<form method="POST" use:enhance action="?/submitFlag" class="flex w-full gap-x-5" >
+		
 
+		<form use:enhance method="POST" action="?/submitFlag" class="flex w-full gap-x-5" >
+			<input type="hidden" name="__superform_id"/>
 			<div class="w-3/4">
 				<Input class="border-primary"
 					type="text"
 					name="flag"
-					aria-invalid={$errors.flag ? 'true' : undefined}
 					placeholder="Flag"
+					aria-invalid={$errors.flag ? 'true' : undefined}
 					bind:value={$form.flag}
 					{...$constraints.flag}
 				/>
 				{#if $errors.flag}<span class="invalid">{$errors.flag}</span>{/if}
 			</div>
 
-			<Button class="w-1/4" type="submit">Sign in</Button>
+			<Button class="w-1/4" type="submit">Submit</Button>
 		</form>
 
 
 	</div>
 </div>
+{/if}
