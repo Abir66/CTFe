@@ -11,6 +11,10 @@
         wrong_percentage = 100 - solved_percentage;
     }
 </script>
+<div id="problem_details_navbar" class="flex">
+    <a href="#" class="font-semibold text-xl mr-5 hover:cursor-pointer"><u class="underline-offset-8">Description</u></a>
+    <a href="#" class="font-medium text-xl hover:cursor-pointer">Discussion</a>
+</div>
 <div class="flex flex-col gap-y-10 lg:flex-row justify-between py-10">
     <div id="problem_details_card" class=" float-left border-2 rounded-lg lg:w-1/2 border-black dark:border-gray-700">
         <div class="flex min-w-0 flex-col p-5">

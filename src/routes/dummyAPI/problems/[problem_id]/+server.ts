@@ -96,7 +96,6 @@ export function GET(requestEvent){
     const { params } = requestEvent;
     const { problem_id } = params;
     const problem = data.find(problem => problem.id == problem_id);
-    console.log(problem_id);
     if (problem) {
         return json(problem);
     }else{
