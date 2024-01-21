@@ -7,6 +7,7 @@ declare global {
 		// interface PageData {}
 		interface PageState {
 			selected : any,
+			modalData: any;
 		}
 		// interface Platform {}
 	}
