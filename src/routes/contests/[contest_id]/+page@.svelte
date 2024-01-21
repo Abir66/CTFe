@@ -5,8 +5,6 @@
     import { Button } from "$lib/components/ui/button";
     import { Separator } from "$lib/components/ui/separator";
     import * as Card from "$lib/components/ui/card"; 
-    console.log(contest_details);
-
 </script>
 
 <div class="flex flex-col gap-y-10 lg:flex-row justify-between py-10">

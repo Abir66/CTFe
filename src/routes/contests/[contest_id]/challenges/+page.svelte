@@ -1,7 +1,6 @@
 <script lang="ts">
 	import ChallengeCard from './challenge_card.svelte';
 	export let data;
-	console.log(data);
 </script>
 
 {#each data.challenge_list as section (section)}

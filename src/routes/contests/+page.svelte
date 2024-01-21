@@ -1,8 +1,7 @@
 <script>
     import SimpleCard from '../../Mycomponents/SimpleCard.svelte';
     import Filter from './Filter.svelte';
-    export let data;
-    console.log(data.upcoming);   
+    export let data;  
 </script>
 
 <div class="lg:flex  flex-row lg:space-x-24" >
