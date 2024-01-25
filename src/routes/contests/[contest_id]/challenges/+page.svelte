@@ -34,7 +34,7 @@
 	}
 </script>
 
-{#if ChallengeDialogueOpen && $page.state.path.includes('challenge') }
+{#if ChallengeDialogueOpen && $page.state.path && $page.state.path.includes('challenge') }
 	<Dialog.Root
 		open={ChallengeDialogueOpen}
 		onOpenChange={(open) => {

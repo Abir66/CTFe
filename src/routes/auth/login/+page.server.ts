@@ -1,4 +1,4 @@
-import { superValidate } from 'sveltekit-superforms/server';
+import {  message, superValidate } from 'sveltekit-superforms/server';
 import { fail } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -18,10 +18,9 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, url, locals: { supabase } }) => {
 		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
-		console.log('POST', form);
 
 		// Convenient validation check:
 		if (!form.valid) {
@@ -30,8 +29,21 @@ export const actions: Actions = {
 		}
 
 		// TODO: Do something with the validated data
+		const email = form.data.email;
+		const password = form.data.password;
+		
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password
+		})
 
+		if (error) {
+			console.error('error', error);
+			return fail(500, { form });
+		}
+
+		// redirect to previous page
 		// Yep, return { form } here too
-		return { form };
+		return message(form, 'success');
 	}
 };

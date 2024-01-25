@@ -1,35 +1,44 @@
 <script lang="ts">
-
+	//import type { PageData } from './$types';
 	import { superForm } from 'sveltekit-superforms/client';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
-	export let data;
+	export let data; // : PageData
 
-	const { form, errors, constraints } = superForm(data.form);
+	const { form, errors, constraints, message, enhance, formId } = superForm(data.form);
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
+
+	import { goto, afterNavigate, invalidate, invalidateAll } from '$app/navigation';
+	import { base } from '$app/paths'
+
+	let previousPage : string = base ;
+
+	afterNavigate(({from}) => {
+		previousPage =  previousPage
+		console.log('previousPage', previousPage)
+	})
+
+	$: if ($message == 'success') {
+		goto(previousPage, {
+			invalidateAll : true
+		})
+	}
+
+
 </script>
+
+
 
 <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px] py-10">
 	<div class="flex flex-col space-y-2 text-center">
-		<h1 class="text-3xl font-semibold tracking-tight mb-5">Create an account</h1>
+		<h1 class="text-3xl font-semibold tracking-tight mb-5">Sign in</h1>
 	</div>
+	<!-- <UserAuthForm /> -->
 
-
-	<form method="POST" class="flex flex-col gap-y-5">
-		<div class="form-input">
-			<Label for="username">Username</Label>
-			<Input
-				type="text"
-				name="username"
-				aria-invalid={$errors.username ? 'true' : undefined}
-				bind:value={$form.username}
-				{...$constraints.username}
-			/>
-			{#if $errors.username}<span class="invalid">{$errors.username}</span>{/if}
-		</div>
-
+	<form use:enhance method="POST" class="flex flex-col gap-y-5">
+		<input type="hidden" name="__superform_id" bind:value={$formId} />
 		<div class="form-input">
 			<Label for="email">E-mail</Label>
 			<Input
@@ -54,16 +63,15 @@
 			{#if $errors.password}<span class="invalid">{$errors.password}</span>{/if}
 
 		</div>
-        <Button type="submit">Register</Button>
+        <Button type="submit">Sign in</Button>
 	</form>
 
     <p class="px-8 text-center text-sm text-muted-foreground">
-        Already have an account?{' '}
-        <a href="/login" class="font-bold underline underline-offset-4 hover:text-primary">
-            Sign in Instead.
+        Don't have an account?{' '}
+        <a href="/auth/register" class="font-bold underline underline-offset-4 hover:text-primary">
+            Create one here.
         </a>
     </p>
-
 </div>
 
 <style>
