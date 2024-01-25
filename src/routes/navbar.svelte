@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Sun, Moon } from 'radix-icons-svelte';
 	import { toggleMode } from 'mode-watcher';
+	import { HamburgerMenu } from 'radix-icons-svelte';
 
 	let showMenu = false;
 
@@ -85,7 +86,7 @@
 			<div class="flex items-center justify-between">
 				<a class="text-xl font-bold md:text-3xl" href="/">CTFe</a>
 				<!-- Mobile menu button -->
-				<Button on:click={toggleNavbar} class="flex md:hidden">M</Button>
+				<Button variant="ghost" on:click={toggleNavbar} class="flex md:hidden"><HamburgerMenu/></Button>
 			</div>
 
 			<!-- Mobile Menu open: "block", Menu closed: "hidden" -->
@@ -99,7 +100,7 @@
 				</div>
 
 				<div class="flex flex-col md:flex-row space-y-5 md:space-x-5 md:space-y-0">
-					<Button on:click={toggleMode} variant="outline" size="icon" class="p-5">
+					<Button on:click={toggleMode} variant="outline" size="icon" class="px-5">
 						<Sun class="absolute rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"/>
 						<Moon class="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"/>
 						<span class="sr-only">Toggle theme</span>
