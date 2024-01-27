@@ -4,7 +4,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
-	export let data;
+	export let data ;
 	import { LockClosed } from 'radix-icons-svelte';
 	import { StarFilled } from 'radix-icons-svelte';
 	import { goto } from '$app/navigation';
@@ -22,6 +22,7 @@
 		{ value: 'running', label: 'Running' },
 		{ value: 'finished', label: 'Finished' }
 	];
+
 </script>
 
 <h1 class="py-5 text-4xl font-bold">Contests</h1>
@@ -82,7 +83,7 @@
 				{#each data.contest_list as contest (contest)}
 					<Table.Row
 						on:click={() => {
-							goto(`/contests/${contest.contest_id}`);
+							goto(`/contests/${contest.id}`);
 						}}
 						class="hover:bg-slate-200 dark:hover:bg-slate-900"
 					>
@@ -94,7 +95,7 @@
 								<StarFilled class="inline text-yellow-500" />
 							{/if}
 						</Table.Cell>
-						<Table.Cell>{contest.start_time}</Table.Cell>
+						<Table.Cell>{new Date(contest.start_time).toDateString()}</Table.Cell>
 						<Table.Cell>{contest.duration}</Table.Cell>
 						<Table.Cell class="text-right">
 							{#if contest.status == 'upcoming'}
