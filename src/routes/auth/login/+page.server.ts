@@ -22,11 +22,13 @@ export const actions: Actions = {
 		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
 
+		
 		// Convenient validation check:
 		if (!form.valid) {
 			// Again, always return { form } and things will just work.
 			return fail(400, { form });
 		}
+
 
 		// TODO: Do something with the validated data
 		const email = form.data.email;
