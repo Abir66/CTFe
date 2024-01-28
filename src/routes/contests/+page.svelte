@@ -23,10 +23,7 @@
 		{ value: 'finished', label: 'Finished' }
 	];
 
-const Search = () => {
 
-     
-};
 
 </script>
 
@@ -67,7 +64,7 @@ const Search = () => {
 			<Select.Input name="favoriteFruit" />
 		</Select.Root>
 
-		<Button on:click={Search}>Search</Button>
+		<Button >Search</Button>
 	</div>
 </div>
 
