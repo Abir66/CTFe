@@ -16,7 +16,7 @@ export const load =  async (serverLoadEvent) => {
   ).map(teamStr => JSON.parse(teamStr));
 
   data.team_shortlist = distinctTeams;
-  console.log(data);
+  // console.log(data);
   
 if (error) {
   console.error('Supabase error:', error);
