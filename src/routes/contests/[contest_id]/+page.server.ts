@@ -8,7 +8,8 @@ export const load =  async (serverLoadEvent) => {
     organizers: users!organizers( id, username ),
      team_shortlist:  teams!register (id ,name)
   `).eq('id', contest_id).single();
-    
+  
+ 
   const distinctTeams = Array.from(
     new Set(
       data.team_shortlist.map((team: any) => JSON.stringify({id: team.id, name: team.name}))
@@ -17,7 +18,7 @@ export const load =  async (serverLoadEvent) => {
 
   data.team_shortlist = distinctTeams;
   // console.log(data);
-  
+    
 if (error) {
   console.error('Supabase error:', error);
 
