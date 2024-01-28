@@ -5,6 +5,10 @@
     import { Button } from "$lib/components/ui/button";
     import { Separator } from "$lib/components/ui/separator";
     import * as Card from "$lib/components/ui/card"; 
+    import { goto } from "$app/navigation";
+    const teamRegister = () => {
+        goto(`/contests/${contest_details.contest_id}/register`);
+    }
      let start_time;
      let end_time;
 $: start_time = new Date(contest_details.start_time).toUTCString();
@@ -42,7 +46,7 @@ $: end_time =new Date(contest_details.end_time).toUTCString() ;
     <div class="w-full lg:w-1/4 ">
         <div>
             <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5">Go to Contest</Button>
-            <Button class="w-full py-6 text-lg">Register</Button>
+            <Button class="w-full py-6 text-lg" on:click={() => teamRegister()}>Register</Button>
         </div>
 
         <Card.Root class="my-10 px-5 py-3">
