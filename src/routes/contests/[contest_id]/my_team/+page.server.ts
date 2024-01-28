@@ -70,13 +70,13 @@ export const actions: Actions = {
         if (error){
             fail(500, { error });
         }
-        console.log(url.pathname);
+
         if(!data){
             error_message = "User not eligible for joinig team"
         }
         else{
             team_members = team_members.concat(data);
-            const { data: add_member_data, error: add_member_error } = await supabase.from('register').insert([{ contest_id: contest_id, team_id: team_id, user_id: data[0].id },]).select()
+            const { data: add_member_data, error: add_member_error } = await supabase.from('team_members').insert([{ contest_id: contest_id, team_id: team_id, user_id: data[0].id },]).select()
             if (add_member_error) {
                 console.error('error', add_member_error);
                 fail(500, { add_member_error });

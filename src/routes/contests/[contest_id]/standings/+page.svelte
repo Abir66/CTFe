@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Table from "$lib/components/ui/table";
     export let data;
-    console.log(data.standings);
+
   </script>
   
   <Table.Root>

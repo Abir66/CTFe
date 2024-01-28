@@ -17,7 +17,6 @@
 
 	afterNavigate(({from}) => {
 		previousPage =  previousPage
-		console.log('previousPage', previousPage)
 	})
 
 	$: if ($message == 'success') {
