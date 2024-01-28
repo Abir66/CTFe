@@ -7,7 +7,7 @@
     import * as Card from "$lib/components/ui/card"; 
     import { goto } from "$app/navigation";
     const teamRegister = () => {
-        goto(`/contests/${contest_details.contest_id}/register`);
+        goto(`/contests/${contest_details.id}/register`);
     }
      let start_time;
      let end_time;
