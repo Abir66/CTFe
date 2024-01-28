@@ -10,7 +10,6 @@
 	let modalDst = '';
 
 	async function showModal(challenge_id) {
-		console.log(challenge_id);
 		const href = `/contests/1/challenges/${challenge_id}`;
 		modalDst = href;
 

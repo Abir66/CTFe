@@ -1,10 +1,11 @@
 <script lang="ts">
     import {page} from "$app/stores";
     import { Separator } from "$lib/components/ui/separator";
-    let contest_name = "BUET CTF 2023";
-
-    const contest_id = $page.params.contest_id;
     
+    export let data;
+    const contest_name = data.contest.contest_name;
+    const contest_id = data.contest.id;
+
     let x=($page.url.pathname).split("/");
     
     let selected='';

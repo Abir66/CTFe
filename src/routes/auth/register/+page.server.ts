@@ -22,7 +22,6 @@ export const actions: Actions = {
 	default: async ({ request, url, locals: { supabase } }) => {
 		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
-		console.log("here")
 		
 		// Convenient validation check:
 		if (!form.valid) {
@@ -33,24 +32,31 @@ export const actions: Actions = {
 		// TODO: Do something with the validated data
 		const {username, email, password} = form.data;
 
+		const dupEmailCheck = await supabase
+			.from('users')
+			.select("email")
+			.eq('email', email)
 
-		const dupEmailCheck = await supabase.rpc('does_email_exist', {p_email: email})
 
 		if(dupEmailCheck.error){
 			return fail(500, { form });
 		}
 
-		else if(dupEmailCheck.data == true){
+		else if(dupEmailCheck.data.length > 0){
 			return setError(form, 'email', 'E-mail already exists.');
 		}
 
-		const dupUsernameCheck = await supabase.rpc('does_username_exist', {p_username: username})
+		const dupUsernameCheck = await supabase
+			.from('users')
+			.select("username")
+			.eq('username', username)
 
+		
 		if(dupUsernameCheck.error){
 			return fail(500, { form });
 		}
 
-		else if(dupUsernameCheck.data == true){
+		else if(dupUsernameCheck.data.length > 0){
 			return setError(form, 'username', 'Username already exists.');
 		}
 
@@ -65,12 +71,9 @@ export const actions: Actions = {
 		})
 
 		if (signupResponse.error) {
-			console.error('error', signupResponse.error);
 			return fail(500, { form });
 		}
 		
-		console.log('signupResponse', signupResponse.data)
 		throw redirect(303, '/auth/verifyEmail')
-
 	}
 };

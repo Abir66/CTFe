@@ -19,6 +19,9 @@ declare global {
 		}
 		interface PageData {
 			session? : Session | null,
+			team? : any,
+			user? : any,
+			contest? : any,
 		}
 		interface PageState {
 			path : string | null,
