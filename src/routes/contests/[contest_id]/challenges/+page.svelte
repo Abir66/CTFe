@@ -11,7 +11,7 @@
 
 	async function showModal(challenge_id) {
 		console.log(challenge_id);
-		const href = `/contests/1/challenges/1`;
+		const href = `/contests/1/challenges/${challenge_id}`;
 		modalDst = href;
 
 		const result = await preloadData(href);
@@ -53,7 +53,7 @@
 {#each data.challenge_list as section (section)}
 	<div class="mb-20">
 		<h2 class="mb-10 scroll-m-20 py-2 text-3xl font-bold">
-			{section.catagory}
+			{section.category}
 		</h2>
 
 		<div class="flex flex-col flex-wrap gap-x-20 gap-y-10 sm:flex-row">
@@ -69,7 +69,7 @@
 					>
 						{challenge.title}
 					</h3>
-					<h4 class="text-center text-lg font-semibold">{challenge.points}</h4>
+					<h4 class="text-center text-lg font-semibold">{challenge.score}</h4>
 				</Card.Root>
 			{/each}
 		</div>

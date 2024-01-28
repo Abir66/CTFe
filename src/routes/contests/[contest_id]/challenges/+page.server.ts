@@ -1,10 +1,11 @@
-export const load =  async (serverLoadEvent) => {
-    const {fetch} = serverLoadEvent;
-    const contest_id = serverLoadEvent.params.contest_id;
-    const response = await fetch("/dummyAPI/contests/"+contest_id+"/challenges"); // error 404?
-    const data = await response.json();
+export const load = async ({url,fetch,params,locals}) => {
+    const constest_id = params.contest_id
+    const user_id = locals.user ? locals.user.id : 0
 
-	return {
+    const {data} = await locals.supabase
+        .rpc('get_contest_challenge_list', {contest_id_param : constest_id, user_id_param : user_id})
+    
+    return {
         challenge_list: data
-	};
+    };
 }

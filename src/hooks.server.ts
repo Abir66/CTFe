@@ -45,9 +45,6 @@ async function authorization({ event, resolve }) {
       if(data) user = data
   }
 
-  console.log(user)
-  console.log(session)
-
   event.locals.user = user
 
   if (event.url.pathname.startsWith('/auth') && session!=null) {
