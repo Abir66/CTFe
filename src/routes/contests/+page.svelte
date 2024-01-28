@@ -23,6 +23,8 @@
 		{ value: 'finished', label: 'Finished' }
 	];
 
+
+
 </script>
 
 <h1 class="py-5 text-4xl font-bold">Contests</h1>
@@ -45,7 +47,7 @@
 					{/each}
 				</Select.Group>
 			</Select.Content>
-			<Select.Input name="favoriteFruit" />
+			<Select.Input name="favoriteFruit1" />
 		</Select.Root>
 
 		<Select.Root>
@@ -62,7 +64,7 @@
 			<Select.Input name="favoriteFruit" />
 		</Select.Root>
 
-		<Button>Search</Button>
+		<Button >Search</Button>
 	</div>
 </div>
 

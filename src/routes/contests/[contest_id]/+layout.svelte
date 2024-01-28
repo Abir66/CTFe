@@ -30,10 +30,10 @@
 
 <div class="flex justify-between py-5 text-sm sm:text-base lg:text-xl mb-10">
     <div class="space-x-3 sm:space-x-5">
-        <a href="/contests/{contest_id}/challenges" class:active={selected==="challenges"}>Challenges</a>
-        <a href="/contests/{contest_id}/standings" class:active={selected==="standings"} >Standings</a>
-        <a href="/contests/{contest_id}/clarifications" class:active={selected==="clarifications"} >Clarifications</a>
-        <a href="/contests/{contest_id}/announcements" class:active={selected==="announcements"} >Announcements</a>
+        <a href="/contests/{contest_id}/challenges" class:active={selected==="challenges"} on:click={()=>{selected="challenges"}}>Challenges</a>
+        <a href="/contests/{contest_id}/standings" class:active={selected==="standings"} on:click={()=>{selected="standings"}} >Standings</a>
+        <a href="/contests/{contest_id}/clarifications" class:active={selected==="clarifications"} on:click={()=>{selected="clarifications"}}>Clarifications</a>
+        <a href="/contests/{contest_id}/announcements" class:active={selected==="announcements"} on:click={()=>{selected="announcements"}}>Announcements</a>
     </div>
     <a href="/contests/{contest_id}/my_team">My Team</a>
 </div>
