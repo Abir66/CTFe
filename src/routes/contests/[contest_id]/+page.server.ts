@@ -5,8 +5,8 @@ export const load =  async (serverLoadEvent) => {
     // const data = await response.json();
     const { data, error } = await serverLoadEvent.locals.supabase.from('contests').select(`
     *,
-    organizers: users!organizers( id, username ),
-     team_shortlist:  teams!register (id ,name)
+    organizers: users  ( id, username ),
+    team_shortlist: teams (id ,name)
   `).eq('id', contest_id).single();
     
   const distinctTeams = Array.from(
