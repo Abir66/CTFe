@@ -1,0 +1,41 @@
+<form
+  action="/contests"
+  method="GET"
+  class="mb-10 flex flex-col items-center justify-between gap-y-5 py-4 text-xl lg:flex-row lg:gap-x-5 lg:gap-y-0"
+>
+  <div class="w-full lg:w-1/2">
+    <Input name="search_str" class="w-full" placeholder="Search contest by name" type="text" />
+  </div>
+
+  <div class="flex w-full justify-between gap-x-5 lg:w-1/2">
+    <Select.Root>
+      <Select.Trigger class="w-full">
+        <Select.Value placeholder="Type" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Group>
+          {#each contest_types as type}
+            <Select.Item value={type.value} label={type.label}>{type.label}</Select.Item>
+          {/each}
+        </Select.Group>
+      </Select.Content>
+      <Select.Input name="type" />
+    </Select.Root>
+
+    <Select.Root>
+      <Select.Trigger class="w-full">
+        <Select.Value placeholder="Status" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Group>
+          {#each contest_status as status}
+            <Select.Item value={status.value} label={status.label}>{status.label}</Select.Item>
+          {/each}
+        </Select.Group>
+      </Select.Content>
+      <Select.Input name="status" />
+    </Select.Root>
+
+    <Button type="submit">Search</Button>
+  </div>
+</form>

@@ -28,11 +28,14 @@
 </script>
 
 <h1 class="py-5 text-4xl font-bold">Contests</h1>
-<div
-	class="mb-10 flex flex-col items-center justify-between gap-y-5 py-4 text-xl lg:flex-row lg:gap-x-5 lg:gap-y-0"
+
+<form
+  action="/contests"
+  method="GET"
+  class="mb-10 flex flex-col items-center justify-between gap-y-5 py-4 text-xl lg:flex-row lg:gap-x-5 lg:gap-y-0"
 >
 	<div class="w-full lg:w-1/2">
-		<Input class="w-full" placeholder="Search contest by name" type="text" />
+		<Input  name="search_str" class="w-full" placeholder="Search contest by name" type="text" />
 	</div>
 
 	<div class="flex w-full justify-between gap-x-5 lg:w-1/2">
@@ -47,7 +50,7 @@
 					{/each}
 				</Select.Group>
 			</Select.Content>
-			<Select.Input name="favoriteFruit1" />
+			<Select.Input name="type" />
 		</Select.Root>
 
 		<Select.Root>
@@ -61,12 +64,12 @@
 					{/each}
 				</Select.Group>
 			</Select.Content>
-			<Select.Input name="favoriteFruit" />
+			<Select.Input name="status" />
 		</Select.Root>
 
-		<Button >Search</Button>
+		<Button type="submit">Search</Button>
 	</div>
-</div>
+</form>
 
 <div class="mb-10 rounded-md border px-10 py-5">
 	{#if data.contest_list.length == 0}
