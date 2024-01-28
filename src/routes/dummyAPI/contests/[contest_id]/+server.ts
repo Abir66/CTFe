@@ -1,5 +1,5 @@
 const contest_data={
-    contest_id : "1",
+    contest_id : "2",
     contest_name : "BUET CTF",
     start_time : "May 02 2023, 00:00:00",
     end_time : "May 02 2023, 00:00:00",

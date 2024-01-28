@@ -19,6 +19,7 @@ export const load: PageServerLoad = async ({params,locals}) => {
         console.error('error', dupTeamCheck.error);
         fail(500, { dupTeamCheck });
     }
+    console.log(dupTeamCheck.data);
     if(dupTeamCheck.data == true){
         const redirect_url = "/contests/" + contest_id + "/my_team";
         redirect(303, redirect_url);
