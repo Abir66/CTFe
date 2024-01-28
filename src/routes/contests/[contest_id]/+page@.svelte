@@ -9,8 +9,10 @@
     const teamRegister = () => {
         goto(`/contests/${contest_details.contest_id}/register`);
     }
-
-    
+     let start_time;
+     let end_time;
+$: start_time = new Date(contest_details.start_time).toUTCString();
+$: end_time =new Date(contest_details.end_time).toUTCString() ;
 </script>
 
 <div class="flex flex-col gap-y-10 lg:flex-row justify-between py-10">
@@ -21,7 +23,7 @@
     </h2>
 
     <div class="text-xl space-y-5 mt-10">
-        <p>{contest_details.start_time}  -  {contest_details.end_time}</p>
+        <p>{start_time}    -    {end_time}</p>
         <p>Format : {contest_details.format}</p>
     </div>
 
@@ -34,7 +36,7 @@
         <h2>Organizers:</h2>
         <ul>
             {#each contest_details.organizers as organizer (organizer.id)}
-                <li class="mt-0 mb-2"><a class="font-semibold" href="/user/{organizer.id}">{organizer.name}</a></li>
+                <li class="mt-0 mb-2"><a class="font-semibold" href="/user/{organizer.id}">{organizer.username}</a></li>
             {/each}
         </ul>
     </div>
@@ -50,17 +52,17 @@
         <Card.Root class="my-10 px-5 py-3">
         <div >
             <h2 class="text-xl font-semibold py-3">
-                Registered Teams <span class="text-lg font-normal">({contest_details.total_registered_teams})</span>
+                Registered Teams <span class="text-lg font-normal">({contest_details.team_shortlist.length})</span>
             </h2>
             <Separator/>
 
             <ul class="py-5 prose dark:prose-invert">
                 {#each contest_details.team_shortlist as team (team.id)}
-                    <li class="mt-0 "><a href="/contests/{contest_details.contest_id}/team/{team.id}">{team.name}</a></li>
+                    <li class="mt-0 "><a href="/contests/{contest_details.id}/team/{team.id}">{team.name}</a></li>
                 {/each}
             </ul>
 
-            <p class="text-right"><a href="/contests/{contest_details.contest_id}/teams">Show Full List</a></p>
+            <p class="text-right"><a href="/contests/{contest_details.id}/teams">Show Full List</a></p>
         </div>
     </Card.Root>
         

@@ -46,15 +46,16 @@ async function authorization({ event, resolve }) {
   }
 
   console.log(user)
+  console.log(session)
 
   event.locals.user = user
 
   if (event.url.pathname.startsWith('/auth') && session!=null) {
+   
     const pathname = event.url.pathname
     if(pathname == '/auth/login' || pathname == '/auth/register')
       throw redirect(303, '/')
   }
-
 
   return resolve(event)
 }
