@@ -8,16 +8,16 @@
     let x=($page.url.pathname).split("/");
     
     let selected='';
-    if(x.includes('challenges')){
+    if($page.url.pathname.includes('challenges')){
         selected='challenges';
     }
-    else if(x.includes('standings')){
+    else if($page.url.pathname.includes('standings')){
         selected='standings';
     }
-    else if(x.includes('clarifications')){
+    else if($page.url.pathname.includes('clarifications')){
         selected='clarifications';
     }
-    else if(x.includes('announcements')){
+    else if($page.url.pathname.includes('announcements')){
         selected='announcements';
     }
 </script>
