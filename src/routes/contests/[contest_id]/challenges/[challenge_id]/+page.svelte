@@ -12,6 +12,8 @@
 	const { form, errors, constraints, enhance, formId } = superForm(data.form);
 	
     $: ({challenge } = data);
+	
+	$: message = data.message;
 
 </script>
 
@@ -41,6 +43,11 @@
 		{/if}
 
         <h2 class="mb-3 text-xl">Author : <a class="font-bold text-blue-700" href="/user/{challenge.author.id}">{challenge.author.username}</a></h2>
+		{#if message == 'correct'}
+        	<p id="filled_success_help" class="mt-2 text-xs text-green-600 dark:text-green-400"><span class="font-medium">{message}</span></p>		
+		{:else }
+			<p id="standard_error_help" class="mt-2 text-xs text-red-600 dark:text-red-400"><span class="font-medium">{message}</span></p>
+		{/if}
 
         <div class="text-center">
             <p class="text-xl ">{challenge.attempted}/{challenge.max_attempts} Attemps</p>
