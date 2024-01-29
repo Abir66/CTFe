@@ -55,23 +55,22 @@ export const actions: Actions = {
         const team_name = form_data.get("team_name");
         const password = form_data.get("password");
         
-        return { success: true };
+        const response = await supabase.rpc('join_team_via_password', {
+            p_user_id: user_id,
+            p_contest_id: contest_id, 
+            p_team_name: team_name, 
+            p_password: password
+        })
+        
+        if(response.error){
+            return fail(500, { join_team_error : "Something went wrong" });
+        }
 
-        return { join_team_error : `error` };
+        if(response.data == "success"){
+            const redirect_url = "/contests/" + contest_id + "/my_team";
+            redirect(303, redirect_url);
+        }
 
-        // const { data: teams_data, error:teams_error } = await supabase.from('teams').insert([{ name: team_name, contest_id: contest_id, leader: user_id },]).select()
-        // if (teams_error) {
-        //     console.error('error', teams_error);
-        //     fail(500, { teams_error });
-        // }
-        // if (teams_data && teams_data[0]) {
-        //     const { data: register_data, error:register_error } = await supabase.from('register').insert([{ contest_id: contest_id, user_id: user_id, team_id: teams_data[0].id },]).select()
-        //     if (register_error) {
-        //         console.error('error', register_error);
-        //         fail(500, { register_error });
-        //     }
-        // }
-        // const redirect_url = "/contests/" + contest_id + "/my_team";
-        // redirect(303, redirect_url);
+        return { join_team_error : response.data };
 	}
 };
