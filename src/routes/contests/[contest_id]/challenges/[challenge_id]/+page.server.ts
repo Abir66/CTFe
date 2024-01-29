@@ -37,14 +37,9 @@ export const load =  async (serverLoadEvent) => {
 		toggle = false;
 		message = message;
 	}
-    const {fetch,locals} = serverLoadEvent;
-    contest_id = serverLoadEvent.params.contest_id;
-    challenge_id = serverLoadEvent.params.challenge_id;
+    const {locals} = serverLoadEvent;
 
 	let { data:challenge_details_data, error:challenge_details_error } = await locals.supabase.rpc('get_contest_challenge_details', {c_id:contest_id, p_id:challenge_id})
-	if (challenge_details_error) console.error(challenge_details_error)
-	else console.log(challenge_details_data)
-
 
 	let { data: challenge_author_data, error: challenge_author_error } = await locals.supabase.from('users').select('id,username').eq('id', challenge_details_data.author_id)
 	// get challenge attachments
@@ -59,7 +54,7 @@ export const load =  async (serverLoadEvent) => {
 		id:challenge_details_data.id,
 		name:challenge_details_data.title,
 		score:challenge_details_data.score,
-		author:challenge_author_data[0],
+		author: challenge_author_data[0],
 		description:challenge_details_data.description,
 		attachments,
 		max_attempts:challenge_details_data.max_attempts,
