@@ -6,7 +6,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import * as Card from "$lib/components/ui/card"; 
     import { goto } from "$app/navigation";
-    
+    $: hehe = data;
     $: start_time = new Date(contest_details.start_time).toUTCString();
     $: end_time =new Date(contest_details.end_time).toUTCString() ;
 </script>
@@ -42,7 +42,11 @@
     <div class="w-full lg:w-1/4 ">
         <div>
             <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5">Go to Contest</Button>
-            <Button class="w-full py-6 text-lg" on:click={() => goto(`/contests/${contest_details.id}/register`)}>Register</Button>
+            {#if data['registration_eligibility']}
+                <Button class="w-full py-6 text-lg" on:click={() => goto(`/contests/${contest_details.id}/register`)}>Register</Button>
+            {:else if data['already_registered']}
+                <Button variant="outline" class="w-full py-6 text-lg bg-green-500 hover:bg-green-500">Registered</Button>
+            {/if}
         </div>
 
         <Card.Root class="my-10 px-5 py-3">
