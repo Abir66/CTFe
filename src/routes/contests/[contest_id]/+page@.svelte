@@ -9,6 +9,7 @@
     
     $: start_time = new Date(contest_details.start_time).toUTCString();
     $: end_time =new Date(contest_details.end_time).toUTCString() ;
+  
 </script>
 
 <div class="flex flex-col gap-y-10 lg:flex-row justify-between py-10">
@@ -41,7 +42,7 @@
 
     <div class="w-full lg:w-1/4 ">
         <div>
-            <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5">Go to Contest</Button>
+            <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5" on:click={() => goto(`/contests/${contest_details.id}/challenges`)}>Go to Contest</Button>
             <Button class="w-full py-6 text-lg" on:click={() => goto(`/contests/${contest_details.id}/register`)}>Register</Button>
         </div>
 

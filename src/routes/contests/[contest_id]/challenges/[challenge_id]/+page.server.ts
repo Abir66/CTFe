@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import { fail } from '@sveltejs/kit';
 import { z } from 'zod';
-
+import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 const schema = z.object({
@@ -12,6 +12,21 @@ export const load =  async (serverLoadEvent) => {
     const {fetch} = serverLoadEvent;
     const contest_id = serverLoadEvent.params.contest_id;
     const challenge_id = serverLoadEvent.params.challenge_id;
+
+	let result = await serverLoadEvent.locals.supabase.rpc('get_contest_status', {p_contest_id : contest_id})
+    
+    console.log(result);
+    
+    if( result.data == 'contest not found'){
+        error(404, "Contest not found");
+    }
+    else
+    {
+        if(result.data == 'upcoming'){
+            error(403, "Contest not started yet");
+        }
+    }
+
     const response = await fetch("/dummyAPI/contests/"+contest_id+"/challenges/"+challenge_id);
     const data = await response.json();
 

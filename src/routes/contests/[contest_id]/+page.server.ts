@@ -23,5 +23,6 @@ export const load = async (serverLoadEvent) => {
 
 	return {
 		contest_details: data
-	};
+	}
+
 }
