@@ -1,48 +1,34 @@
+import Contest from '$lib/server/database/contest'
+import { error } from '@sveltejs/kit';
+
 export const load = async ({params, locals}) => {
+	
 	const contest_id = params.contest_id;
-	const { data: contest_details, error } = await locals.supabase
-		.from('contests')
-		.select(`
-			*,
-			organizers: users!organizers( id, username ),
-			team_shortlist:  teams!team_members (id ,name)
-			`)
-		.eq('id', contest_id)
-		.single();
+	const contest_details = await Contest.get_contest_details(contest_id);
 
-	const distinctTeams = Array.from(
-		new Set(
-			contest_details.team_shortlist.map((team: any) => JSON.stringify({ id: team.id, name: team.name }))
-		)
-	).map(teamStr => JSON.parse(teamStr));
+	if(!contest_details.success) return error(500, "Internal Server Error");
+	else if(contest_details.data.length == 0) return error(404, "Contest not found");
 
+	const [organizers, team_shortlist, registration_eligibility] = await Promise.all([
+		Contest.get_contest_organizers(contest_id),
+		Contest.get_contest_teams_shortlist(contest_id),
+		Contest.get_registration_eligibility(contest_id, locals.user ? locals.user.id : 0)
+	]);
 
-	contest_details.team_shortlist = distinctTeams;
-
-
-
-	let response
-	
-	if(locals.user){
-		response = await locals.supabase.rpc('registration_eligibility', {p_contest_id: contest_id, p_user_id: locals.user.id});
+	let data = {
+		contest_details: contest_details.data[0],
+		organizers: organizers.data,
+		team_shortlist: team_shortlist.data,
+		team_count: team_shortlist.success && team_shortlist.data.length > 0 ? team_shortlist.data[0].total_teams : 0,
+		registration_eligibility: false,
+		already_registered: false,
 	}
-	else{
-		response = await locals.supabase.rpc('registration_eligibility', {p_contest_id: contest_id, p_user_id: 0});
-	}
-	
-	const data = {
-		contest_details: contest_details,
-	}
-	
-	if(!response.error && response.data.status){
-		if(response.data.status == "eligible"){
-			data["registration_eligibility"] = true;
-		}
 
-		else if(response.data.status == "already registered"){
-			data["already_registered"] = true;
-		}
-	} 
+	if(registration_eligibility.success && registration_eligibility.data.length > 0){
+		data.registration_eligibility = registration_eligibility.data[0].registration_eligibility.status == "eligible";
+		data.already_registered = registration_eligibility.data[0].registration_eligibility.status == "already registered";
+		// if(data.already_registered) data.team_id = registration_eligibility.data[0].registration_eligibility.team_id;
+	}
 	
 	return data;
 

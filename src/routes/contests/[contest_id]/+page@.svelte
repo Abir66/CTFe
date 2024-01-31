@@ -6,7 +6,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import * as Card from "$lib/components/ui/card"; 
     import { goto } from "$app/navigation";
-    $: hehe = data;
+
     $: start_time = new Date(contest_details.start_time).toUTCString();
     $: end_time =new Date(contest_details.end_time).toUTCString() ;
   
@@ -32,7 +32,7 @@
     <div class="prose prose-lg dark:prose-invert py-10">
         <h2>Organizers:</h2>
         <ul>
-            {#each contest_details.organizers as organizer (organizer.id)}
+            {#each data.organizers as organizer (organizer.id)}
                 <li class="mt-0 mb-2"><a class="font-semibold" href="/user/{organizer.id}">{organizer.username}</a></li>
             {/each}
         </ul>
@@ -44,9 +44,9 @@
         <div>
 
             <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5" on:click={() => goto(`/contests/${contest_details.id}/challenges`)}>Go to Contest</Button>
-            {#if data['registration_eligibility']}
+            {#if data.registration_eligibility}
                 <Button class="w-full py-6 text-lg" on:click={() => goto(`/contests/${contest_details.id}/register`)}>Register</Button>
-            {:else if data['already_registered']}
+            {:else if data.already_registered}
                 <Button variant="outline" class="w-full py-6 text-lg bg-green-500 hover:bg-green-500">Registered</Button>
             {/if}
 
@@ -55,12 +55,12 @@
         <Card.Root class="my-10 px-5 py-3">
         <div >
             <h2 class="text-xl font-semibold py-3">
-                Registered Teams <span class="text-lg font-normal">({contest_details.team_shortlist.length})</span>
+                Registered Teams <span class="text-lg font-normal">({data.team_count})</span>
             </h2>
             <Separator/>
 
             <ul class="py-5 prose dark:prose-invert">
-                {#each contest_details.team_shortlist as team (team.id)}
+                {#each data.team_shortlist as team (team.id)}
                     <li class="mt-0 "><a href="/contests/{contest_details.id}/team/{team.id}">{team.name}</a></li>
                 {/each}
             </ul>
