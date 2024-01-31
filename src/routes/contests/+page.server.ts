@@ -1,42 +1,19 @@
+import contest from '$lib/server/database/contest.js';
+import { error } from '@sveltejs/kit';
 
-
-export const load = async ({url,fetch,params,locals: { supabase }}) => {
-
-
+export const load = async ({url,params,locals}) => {
     let search_str = url.searchParams.get('search_str');
     let type = url.searchParams.get('type');
     let status = url.searchParams.get('status');
 
-    // console.log(search_str, type, status);
-   
-    if(search_str == null)
-    {
-        search_str = "";
-    }
-    if(type == null || type == "")
-    {
-        type = "all";
-    }
-    if(status == null || status == "")
-    {
-        status = "all";
-    }
-    let { data, error } = await supabase.rpc('get_contests', {search_str: search_str, stat: status , typeof: type});
-//     console.log(supabase);
-//    console.log(data[0].start_time);
+    const res = await contest.get_contest_list(search_str, type, status);
 
-    if (error) {
-        console.error(error);
-        return {
-            status: 500,
-            body: error,
-            contest_list: []
-        };
+    if(res.error){
+        console.error(res.error);
+        return error(500, "something went wrong");
     }
   
     return {
-       
-        contest_list:data
-        
+        contest_list: res.data
     };
 }
