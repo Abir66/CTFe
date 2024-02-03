@@ -43,7 +43,9 @@ export const load =  async (serverLoadEvent) => {
 				
             }
             else{  
-				problem_detail=await problem.get_specific_problem_variation(contest_id,challenge_id,teams.data.team_id);
+			
+				
+				problem_detail=await problem.get_specific_problem_variation(contest_id,challenge_id,teams.data[0].team_id);
 				console.log(problem_detail);
             }
         }
