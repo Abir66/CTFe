@@ -1,14 +1,14 @@
 import { superValidate } from 'sveltekit-superforms/server';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-
+import users from '$lib/server/database/users';
+import problem from '$lib/server/database/problem';
 const schema = z.object({
     flag: z.string().min(1),
 });
-let contest_id = 0;
-let challenge_id = 0;
+
 let message = "";
 let toggle = false;
 export const load =  async (serverLoadEvent) => {
@@ -16,11 +16,13 @@ export const load =  async (serverLoadEvent) => {
     const {fetch} = serverLoadEvent;
     const contest_id = serverLoadEvent.params.contest_id;
     const challenge_id = serverLoadEvent.params.challenge_id;
-
+    const user_id = serverLoadEvent.locals.user ? serverLoadEvent.locals.user.id : 0
+	console.log("contest_id",contest_id);
+	
 	let result = await serverLoadEvent.locals.supabase.rpc('get_contest_status', {p_contest_id : contest_id})
     
-    console.log(result);
-    
+    console.log("hehe",result);
+    let problem_detail;
     if( result.data == 'contest not found'){
         error(404, "Contest not found");
     }
@@ -29,6 +31,27 @@ export const load =  async (serverLoadEvent) => {
         if(result.data == 'upcoming'){
             error(403, "Contest not started yet");
         }
+		let teams = await users.is_registered_to_contest(contest_id,user_id);
+        console.log(teams);
+        if(result.data == 'running')
+        {
+            if(teams.data.length == 0){
+               
+				problem_detail=await problem.get_any_problem_variation(contest_id,challenge_id);
+				console.log(problem_detail);
+				
+				
+            }
+            else{  
+				problem_detail=await problem.get_specific_problem_variation(contest_id,challenge_id,teams.data.team_id);
+				console.log(problem_detail);
+            }
+        }
+        else if(result.data == 'finished'){
+
+			problem_detail=await problem.get_any_problem_variation(contest_id,challenge_id);
+			console.log(problem_detail);
+        }
     }
 
 	if(!toggle && message != ""){
@@ -36,12 +59,14 @@ export const load =  async (serverLoadEvent) => {
 	}else if(toggle){
 		toggle = false;
 		message = message;
+		console.log(message);
+		
 	}
     const {locals} = serverLoadEvent;
 
-	let { data:challenge_details_data, error:challenge_details_error } = await locals.supabase.rpc('get_contest_challenge_details', {c_id:contest_id, p_id:challenge_id})
+	
 
-	let { data: challenge_author_data, error: challenge_author_error } = await locals.supabase.from('users').select('id,username').eq('id', challenge_details_data.author_id)
+	let { data: challenge_author_data, error: challenge_author_error } = await locals.supabase.from('users').select('id,username').eq('id', problem_detail.data.author_id)
 	// get challenge attachments
 	const attachments= [
 		{ name: 'flag_generator.py', url: 'https://google.com' },
@@ -49,18 +74,14 @@ export const load =  async (serverLoadEvent) => {
 	]
 	// get challenge attempts and flag format
 	const attempted = 3
-	const flag_format = "buet_ctf{Th1s_1s_4n_3x4mpl3_f14g}"
 	const json_data = {
-		id:challenge_details_data.id,
-		name:challenge_details_data.title,
-		score:challenge_details_data.score,
-		author: challenge_author_data[0],
-		description:challenge_details_data.description,
+
+		challenge: problem_detail.data[0],
 		attachments,
-		max_attempts:challenge_details_data.max_attempts,
-		attempted,
-		flag_format
+		
 	}
+	console.log(json_data);
+	
 
 
 	const form = await superValidate(schema);
@@ -74,7 +95,7 @@ export const load =  async (serverLoadEvent) => {
 
 
 export const actions: Actions = {
-	submitFlag: async ({ request,locals }) => {
+	submitFlag: async ({ request,locals,params }) => {
 		message = "clicked"
 		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
@@ -87,7 +108,7 @@ export const actions: Actions = {
 
 		// chcck max attempts
 
-		let { data, error } = await locals.supabase.rpc('check_submitted_flag', {c_id:contest_id, p_id:challenge_id, submission:form.data.flag})
+		let { data, error } = await locals.supabase.rpc('check_submitted_flag', {c_id:params.contest_id, p_id:params.challenge_id, submission:form.data.flag})
 		if (error){
 			fail(500, { form });
 		}
@@ -104,6 +125,6 @@ export const actions: Actions = {
 		// TODO: Do something with the validated data
 
 		// Yep, return { form } here too
-		//return { form };
+	  
 	}
 };

@@ -10,7 +10,7 @@
 	let modalDst = '';
 
 	async function showModal(challenge_id) {
-		const href = `/contests/${data.constest_id}/challenges/${challenge_id}`;
+		const href = `/contests/${data.contest_id}/challenges/${challenge_id}`;
 		modalDst = href;
 
 		const result = await preloadData(href);

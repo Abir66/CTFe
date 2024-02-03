@@ -12,6 +12,9 @@
 	const { form, errors, constraints, enhance, formId } = superForm(data.form);
 	
     $: ({challenge } = data);
+
+	$: console.log(challenge);
+	
 	
 	$: message = data.message;
 
@@ -20,13 +23,13 @@
 {#if challenge}
 <div class="flex min-w-0 flex-col items-center p-5">
 	<div class="text-center">
-		<h1 class="text-2xl font-bold">{challenge.name}</h1>
-		<h2 class="text-2xl">{challenge.score}</h2>
+		<h1 class="text-2xl font-bold">{challenge.challenge.title}</h1>
+		<h2 class="text-2xl">{challenge.challenge.score}</h2>
 	</div>
 
 	<div class="flex flex-col space-y-5">
 		<div class="prose prose-lg dark:prose-invert py-5">
-			<SvelteMarkdown source={challenge.description} />
+			<SvelteMarkdown source={challenge.challenge.description} />
 		</div>
 
 		{#if challenge.attachments && challenge.attachments.length > 0}
@@ -42,7 +45,7 @@
         </div>
 		{/if}
 
-        <h2 class="mb-3 text-xl">Author : <a class="font-bold text-blue-700" href="/user/{challenge.author.id}">{challenge.author.username}</a></h2>
+        <h2 class="mb-3 text-xl">Author : <a class="font-bold text-blue-700" href="/user/{challenge.challenge.author_id}">{challenge.challenge.author_name}</a></h2>
 		{#if message == 'correct'}
         	<p id="filled_success_help" class="mt-2 text-xs text-green-600 dark:text-green-400"><span class="font-medium">{message}</span></p>		
 		{:else }
@@ -50,12 +53,12 @@
 		{/if}
 
         <div class="text-center">
-            <p class="text-xl ">{challenge.attempted}/{challenge.max_attempts} Attemps</p>
+            <p class="text-xl ">{challenge.challenge.attempt_count}/{challenge.challenge.max_attempts} Attemps</p>
         </div>
 
 		
 
-		<form use:enhance method="POST" action="?/submitFlag" class="flex w-full gap-x-5" >
+		<form use:enhance method="POST" action="?/submitFlag" class="flex w-full gap-x-5"  >
 			<input type="hidden" name="__superform_id"/>
 			<div class="w-3/4">
 				<Input class="border-primary"
