@@ -1,10 +1,44 @@
 <script lang="ts">
+    import {onMount} from 'svelte';
     import {page} from "$app/stores";
     import { Separator } from "$lib/components/ui/separator";
     
     export let data;
     const contest_name = data.contest.contest_name;
     const contest_id = data.contest.id;
+    // calculate remaining time
+    let contest_state = "";
+    let message = "";
+    console.log(data.contest.start_time);
+    console.log(new Date());
+    console.log(data.contest.end_time);
+    if(new Date(data.contest.start_time) > new Date()){
+        contest_state = "Upcoming";
+        message = "Contest will start on "+data.contest.start_time;
+    }
+    else if(new Date(data.contest.end_time) < new Date()){
+        contest_state = "Ended";
+        message = "Contest has ended";
+    }
+    else{
+        contest_state = "Running";
+    }
+    const end_time = new Date(data.contest.end_time);
+    let time = new Date();
+    $: timeDifference = Math.max(0,(end_time - time));
+    $: hours = Math.floor(timeDifference / (1000 * 60 * 60));
+	$: minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+	$: seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+    onMount(() => {
+		const interval = setInterval(() => {
+			time = new Date();
+		}, 1000);
+
+		return () => {
+			clearInterval(interval);
+		};
+	});
+
 
     let x=($page.url.pathname).split("/");
     
@@ -21,11 +55,30 @@
     else if($page.url.pathname.includes('announcements')){
         selected='announcements';
     }
-</script>
 
-<h1 class="scroll-m-20 mt-5 py-2 text-3xl font-extrabold">
-    {contest_name}
-</h1>
+    console.log(contest_state);
+
+
+
+
+
+</script>
+<div class="flex flex-row justify-between">
+    <h1 class="scroll-m-20 mt-5 py-2 text-3xl font-extrabold">
+        {contest_name}
+    </h1>
+    {#if contest_state==="Running"}
+        <div class="scroll-m-20 mt-5 py-2 text-3xl font-bold float-right">
+            <p>{hours}:{minutes}:{seconds}</p>
+        </div>
+    {:else}
+        <div class="scroll-m-20 mt-5 py-2 text-3xl font-bold float-right">
+            <p>{message}</p>
+        </div>
+    {/if}
+</div>
+
+
 
 <Separator/>
 
