@@ -18,7 +18,13 @@ async function get_specific_problem_variation(contest_id,problem_id,team_id) {
         FROM team_attempts
         WHERE team_id = $2 AND contest_id = $1 AND problem_id = $3
     `
+    
     let attempt_count = await Database.run_query(get_attempt_count, [contest_id,team_id,problem_id]);
+    console.log("contest_id",contest_id);
+    console.log("problem_id",problem_id);
+    console.log("team_id",team_id);
+    console.log("attempt_count",attempt_count);
+    console.log("result",result);
     result.data[0].attempt_count = 0;
     if(attempt_count.data.length != 0){
         result.data[0].attempt_count = attempt_count.data[0].attempt_count;

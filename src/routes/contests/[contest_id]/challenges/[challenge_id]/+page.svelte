@@ -46,11 +46,7 @@
 		{/if}
 
         <h2 class="mb-3 text-xl">Author : <a class="font-bold text-blue-700" href="/user/{challenge.challenge.author_id}">{challenge.challenge.author_name}</a></h2>
-		{#if message == 'correct'}
-        	<p id="filled_success_help" class="mt-2 text-xs text-green-600 dark:text-green-400"><span class="font-medium">{message}</span></p>		
-		{:else }
-			<p id="standard_error_help" class="mt-2 text-xs text-red-600 dark:text-red-400"><span class="font-medium">{message}</span></p>
-		{/if}
+		
 
         <div class="text-center">
             <p class="text-xl ">{challenge.challenge.attempt_count}/{challenge.challenge.max_attempts} Attemps</p>
@@ -74,7 +70,11 @@
 
 			<Button class="w-1/4" type="submit">Submit</Button>
 		</form>
-
+		{#if message == 'correct' && message.length > 0}
+        	<p id="filled_success_help" class="p-3 text-center rounded mt-2 text-md bg-green-500 dark:bg-green-600"><span class=" font-semibold">{message}</span></p>		
+		{:else if message.length > 0}
+			<p id="standard_error_help" class="p-3 text-center rounded mt-2 text-md bg-red-600 dark:bg-red-700"><span class=" font-semibold">{message}</span></p>
+		{/if}
 
 	</div>
 </div>
