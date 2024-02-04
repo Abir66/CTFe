@@ -103,11 +103,23 @@ async function get_registration_eligibility(contest_id, user_id){
     return result;
 }
 
+async function get_contest_type(contest_id) {
+    const query = `
+        SELECT type
+        FROM contests
+        WHERE id = $1;
+    `;
+    const params = [contest_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 export default {
     get_contest_list,
     get_contest_details,
     get_contest_organizers,
     get_contest_teams_shortlist,
-    get_registration_eligibility
+    get_registration_eligibility,
+    get_contest_type
 }
 
