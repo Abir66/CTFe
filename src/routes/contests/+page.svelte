@@ -23,7 +23,12 @@
 		{ value: 'finished', label: 'Finished' }
 	];
 
+const get_time = (duration) => {
+	let hours = Math.floor(duration / 3600);
+	let minutes = Math.floor((duration % 3600) / 60);
 
+	return `${hours}h : ${minutes}m `;
+};
 
 </script>
 
@@ -101,7 +106,7 @@
 							{/if}
 						</Table.Cell>
 						<Table.Cell>{new Date(contest.start_time).toDateString()}</Table.Cell>
-						<Table.Cell>{contest.duration}</Table.Cell>
+						<Table.Cell>{get_time(contest.duration)}</Table.Cell>
 						<Table.Cell class="text-right">
 							{#if contest.status == 'upcoming'}
 								<Badge class="bg-blue-500">{contest.status}</Badge>

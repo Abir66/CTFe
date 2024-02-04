@@ -13,7 +13,7 @@ const schema = z.object({
 
 let message = "";
 let toggle = false;
-let team_id = 0;
+
 let maxed_out = false;
 export const load =  async (serverLoadEvent) => {
 
@@ -34,7 +34,8 @@ export const load =  async (serverLoadEvent) => {
         }
 		let teams = await users.is_registered_to_contest(contest_id,user_id);
         // console.log(teams);
-		team_id = teams.data[0].team_id;
+		
+		
         if(result.data == 'running')
         {
             if(teams.data.length == 0){
@@ -103,11 +104,23 @@ export const load =  async (serverLoadEvent) => {
 
 export const actions: Actions = {
 	submitFlag: async ({ request,locals,params }) => {
+
+		if(!locals.user){
+			
+			throw redirect(301, '/auth/login');
+		}
+        let teams = await users.is_registered_to_contest(params.contest_id,params.user_id);
+        // console.log(teams);
+		
+		if(teams.data.length==0){
+			throw redirect(301, '/contests/'+params.contest_id+'/register');
+		
+		}
 		const form = await superValidate(request, schema);
         console.log("Got flag - ", form.data.flag)
 		// console.log("Got contest_id - ", params.contest_id)
 		// console.log("Got challenge_id - ", params.challenge_id)
-		let status = await problem.get_problem_status(params.contest_id,params.challenge_id,locals.user.id);
+		let status = await problem.get_problem_status(params.contest_id,params.challenge_id,teams.data[0].team_id);
 		console.log("status - ", status)
 		if(status){
 			message = "you already solved this problem";
@@ -126,7 +139,7 @@ export const actions: Actions = {
 
 		// chcck max attempts
 
-		const test = await flag_submission.check_submitted_flag(locals.user.id,params.contest_id,params.challenge_id,team_id,form.data.flag);
+		const test = await flag_submission.check_submitted_flag(locals.user.id,params.contest_id,params.challenge_id,teams.data[0].team_id,form.data.flag);
 		if(!test.success){
 			fail(500, { form });
 		}
