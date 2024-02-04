@@ -5,23 +5,24 @@ import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import users from '$lib/server/database/users';
 import problem from '$lib/server/database/problem';
+import flag_submission from '$lib/server/database/contest_submission';
+
 const schema = z.object({
     flag: z.string().min(1),
 });
 
 let message = "";
 let toggle = false;
+let team_id = 0;
+let maxed_out = false;
 export const load =  async (serverLoadEvent) => {
 
     const {fetch} = serverLoadEvent;
     const contest_id = serverLoadEvent.params.contest_id;
     const challenge_id = serverLoadEvent.params.challenge_id;
     const user_id = serverLoadEvent.locals.user ? serverLoadEvent.locals.user.id : 0
-	console.log("contest_id",contest_id);
 	
 	let result = await serverLoadEvent.locals.supabase.rpc('get_contest_status', {p_contest_id : contest_id})
-    
-    console.log("hehe",result);
     let problem_detail;
     if( result.data == 'contest not found'){
         error(404, "Contest not found");
@@ -32,7 +33,8 @@ export const load =  async (serverLoadEvent) => {
             error(403, "Contest not started yet");
         }
 		let teams = await users.is_registered_to_contest(contest_id,user_id);
-        console.log(teams);
+        // console.log(teams);
+		team_id = teams.data[0].team_id;
         if(result.data == 'running')
         {
             if(teams.data.length == 0){
@@ -40,13 +42,16 @@ export const load =  async (serverLoadEvent) => {
 				problem_detail=await problem.get_any_problem_variation(contest_id,challenge_id);
 				console.log(problem_detail);
 				
-				
             }
             else{  
 			
-				
 				problem_detail=await problem.get_specific_problem_variation(contest_id,challenge_id,teams.data[0].team_id);
-				console.log(problem_detail);
+				console.log(problem_detail.data[0].attempt_count,problem_detail.data[0].max_attempts);
+				if(problem_detail.data[0].attempt_count === problem_detail.data[0].max_attempts){
+					maxed_out = true;
+				}else{
+					maxed_out = false;
+				}
             }
         }
         else if(result.data == 'finished'){
@@ -82,7 +87,7 @@ export const load =  async (serverLoadEvent) => {
 		attachments,
 		
 	}
-	console.log(json_data);
+	//console.log(json_data);
 	
 
 
@@ -98,24 +103,40 @@ export const load =  async (serverLoadEvent) => {
 
 export const actions: Actions = {
 	submitFlag: async ({ request,locals,params }) => {
-		message = "clicked"
-		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
         console.log("Got flag - ", form.data.flag)
-		// Convenient validation check:
+		// console.log("Got contest_id - ", params.contest_id)
+		// console.log("Got challenge_id - ", params.challenge_id)
+		let status = await problem.get_problem_status(params.contest_id,params.challenge_id,locals.user.id);
+		console.log("status - ", status)
+		if(status){
+			message = "you already solved this problem";
+			toggle = true;
+			return null;
+		}
+		if(maxed_out){
+			message = "no more attempts";
+			toggle = true;
+			return null;
+		}
+
 		if (!form.valid) {
-			// Again, always return { form } and things will just work.
 			return fail(400, { form });
 		}
 
 		// chcck max attempts
 
-		let { data, error } = await locals.supabase.rpc('check_submitted_flag', {c_id:params.contest_id, p_id:params.challenge_id, submission:form.data.flag})
-		if (error){
+		const test = await flag_submission.check_submitted_flag(locals.user.id,params.contest_id,params.challenge_id,team_id,form.data.flag);
+		if(!test.success){
 			fail(500, { form });
 		}
 
-		if(!data){
+
+
+		// let { data, error } = await locals.supabase.rpc('check_submitted_flag', {c_id:params.contest_id, p_id:params.challenge_id, submission:form.data.flag})
+
+		//console.log(error);
+		if(!test.data[0].exists){
 			message = "wrong flag"
 		}else{
 			message = "correct"
@@ -124,6 +145,7 @@ export const actions: Actions = {
 			message = ""
 		}
 		toggle = true;
+
 		// TODO: Do something with the validated data
 
 		// Yep, return { form } here too
