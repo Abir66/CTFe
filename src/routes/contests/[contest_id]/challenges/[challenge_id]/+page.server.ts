@@ -41,13 +41,13 @@ export const load =  async (serverLoadEvent) => {
             if(teams.data.length == 0){
                
 				problem_detail=await problem.get_any_problem_variation(contest_id,challenge_id);
-				console.log(problem_detail);
+				// console.log(problem_detail);
 				
             }
             else{  
 			
 				problem_detail=await problem.get_specific_problem_variation(contest_id,challenge_id,teams.data[0].team_id);
-				console.log(problem_detail.data[0].attempt_count,problem_detail.data[0].max_attempts);
+				// console.log(problem_detail.data[0].attempt_count,problem_detail.data[0].max_attempts);
 				if(problem_detail.data[0].attempt_count === problem_detail.data[0].max_attempts){
 					maxed_out = true;
 				}else{
@@ -58,7 +58,7 @@ export const load =  async (serverLoadEvent) => {
         else if(result.data == 'finished'){
 
 			problem_detail=await problem.get_any_problem_variation(contest_id,challenge_id);
-			console.log(problem_detail);
+			// console.log(problem_detail);
         }
     }
 
@@ -109,7 +109,9 @@ export const actions: Actions = {
 			
 			throw redirect(301, '/auth/login');
 		}
-        let teams = await users.is_registered_to_contest(params.contest_id,params.user_id);
+		// console.log(locals.user.id);
+		
+        let teams = await users.is_registered_to_contest(params.contest_id,locals.user.id);
         // console.log(teams);
 		
 		if(teams.data.length==0){
