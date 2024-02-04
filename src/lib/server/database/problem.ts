@@ -1,7 +1,7 @@
 import Database from './database';
 async function get_specific_problem_variation(contest_id,problem_id,team_id) {
 
-   console.log(team_id);
+//    console.log(team_id);
    
     const query = `
         SELECT cp.score, cp.max_attempts, cp.author_id, cp.category, cp.title, pv.description,u.username as author_name
@@ -20,11 +20,11 @@ async function get_specific_problem_variation(contest_id,problem_id,team_id) {
     `
     
     let attempt_count = await Database.run_query(get_attempt_count, [contest_id,team_id,problem_id]);
-    console.log("contest_id",contest_id);
-    console.log("problem_id",problem_id);
-    console.log("team_id",team_id);
-    console.log("attempt_count",attempt_count);
-    console.log("result",result);
+    // console.log("contest_id",contest_id);
+    // console.log("problem_id",problem_id);
+    // console.log("team_id",team_id);
+    // console.log("attempt_count",attempt_count);
+    // console.log("result",result);
     result.data[0].attempt_count = 0;
     if(attempt_count.data.length != 0){
         result.data[0].attempt_count = attempt_count.data[0].attempt_count;
@@ -42,7 +42,7 @@ async function get_any_problem_variation(contest_id,problem_id) {
     `;
     const params = [contest_id,problem_id];
     let result = await Database.run_query(query, params);
-    console.log(result);
+    // console.log(result);
     
     return result;
 }
@@ -57,10 +57,43 @@ async function get_problem_status(contest_id,problem_id,team_id){
     let result = await Database.run_query(query, params);
     return result.data[0].exists;
 }
+async function get_all_problems_of_contest(contest_id,team_id){
+    const query =`SELECT 
+    json_agg(json_build_object(
+        'category', category,
+        'challenges', challenges
+    ))
+
+FROM (
+    SELECT 
+        category, 
+        json_agg(json_build_object(
+            'id', cp.id,
+            'title', cp.title,
+            'score', cp.score,
+            'status', 
+            CASE 
+                WHEN s.id IS NOT NULL THEN 'solved'
+                ELSE 'unsolved'
+            END
+        )) AS challenges
+    FROM contest_problems cp
+    LEFT JOIN solves s ON cp.id = s.problem_id AND s.team_id = $2
+    WHERE cp.contest_id = $1
+    GROUP BY category
+) subquery`
+
+    const params = [contest_id,team_id];
+    let result = await Database.run_query(query, params);
+    // console.log(result.data[0].json_agg);
+    return result.data[0].json_agg;
+
+}
 
 export default 
 {
     get_specific_problem_variation,
     get_any_problem_variation,
-    get_problem_status
+    get_problem_status,
+    get_all_problems_of_contest
 }
