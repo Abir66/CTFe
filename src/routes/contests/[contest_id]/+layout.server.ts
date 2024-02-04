@@ -7,6 +7,7 @@ export const load = async ({params,locals}) => {
 		.from('contests')
 		.select('id, start_time, end_time, contest_name, memberlimit, type')
 		.eq('id', contest_id)
+
     
     if(response.error){
         return error(500, "something went wrong");

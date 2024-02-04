@@ -1,76 +1,89 @@
-import { superValidate } from 'sveltekit-superforms/server';
+
 import type { Actions, PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { goto } from '$app/navigation';
-import { page } from '$app/stores';
 import { fail } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
+import ContestRegistration from '$lib/server/database/contest_registration'
+import Contest from '$lib/server/database/contest'
 
 
-let contest_id = "";
-let user_id = 0;
+import { z } from 'zod'
+import { message, superValidate } from 'sveltekit-superforms/server';
+
+const team_create_scheme = z.object({
+    team_name: z.string().min(3).max(20),
+    contest_password: z.string().nullable()
+});
+
+const team_join_scheme = z.object({
+    team_name: z.string().min(3).max(20),
+    team_password: z.string().min(4)
+});
 
 
 export const load: PageServerLoad = async ({params,locals}) => {
 
-    if(!locals.user) {
-        error(401, "You must be logged in to register for a contest");
-    }
-        
-    contest_id = params.contest_id;
-    user_id = locals.user.id;
-    const supabase = locals.supabase;
-    const dupTeamCheck = await supabase.rpc('does_team_exist', {u_id: user_id, c_id: contest_id})
-    if(dupTeamCheck.error){
-        console.error('error', dupTeamCheck.error);
-        return fail(500, { dupTeamCheck });
-    }
+    const contest_type_response = await Contest.get_contest_type(params.contest_id);
+    
+    if(contest_type_response.error) error(500, "Something went wrong");
+    if(contest_type_response.data.length == 0) error(404, "Contest not found");
+    if(!locals.user) error(401, "You must be logged in to register for a contest");
+    
+    
+    const user_id = locals.user.id;
+    const contest_type = contest_type_response.data[0].type;
 
-    if(dupTeamCheck.data == true){
-        const redirect_url = "/contests/" + contest_id + "/my_team";
-        redirect(303, redirect_url);
+
+    const response = await ContestRegistration.does_user_have_team(user_id, parseInt(params.contest_id));
+
+    if(response.error) return error(500, "Something went wrong");
+    if(response.data.length > 0) redirect(303, "/contests/" + params.contest_id + "/my_team");
+    
+
+    const team_create_form = await superValidate(team_create_scheme);
+    const team_join_form = await superValidate(team_join_scheme);
+
+    return{
+        contest_type,
+        team_create_form,
+        team_join_form
     }
 }
 
 export const actions: Actions = {
-	create: async ({ request, url, locals: { supabase } }) => {
-        const form_data = await request.formData();
-        const team_name = form_data.get("team_name");
+	create: async ({ request, params, locals}) => {
+        const team_create_form = await superValidate(request, team_create_scheme);
+        if (!team_create_form.valid) return fail(400, { team_create_form});
 
-        const { error:teams_error } = await supabase.from('teams').insert([{ name: team_name, contest_id: contest_id, leader_id: user_id },])
-        if (teams_error) {
-            if(teams_error.message.includes("duplicate key value violates unique constraint")){
-                return { create_team_error : `Team "${team_name}"already exists` };
-            }
-            return fail(500, { create_team_error : "Something went wrong" });
-        }
-        const redirect_url = "/contests/" + contest_id + "/my_team";
-        redirect(303, redirect_url);
+        if(!locals.user) error(401, "You must be logged in to register for a contest");
+
+        const team_name = team_create_form.data.team_name;
+		const contest_password = team_create_form.data.contest_password;
+
+        const respose = await ContestRegistration.create_team(locals.user.id, params.contest_id, team_name, contest_password);
+        console.log("respose", respose);
+
+        if(respose.error) return message(team_create_form, 'Something went wrong');
+        if(respose.data[0]['result'] == 'success') redirect(303, "/contests/" + params.contest_id + "/my_team");
+        return message(team_create_form, respose.data[0]['result']);
 	},
 
 
-    join: async ({ request, url, locals: { supabase } }) => {
-    
-        const form_data = await request.formData();
-        const team_name = form_data.get("team_name");
-        const password = form_data.get("password");
-        
-        const response = await supabase.rpc('join_team_via_password', {
-            p_user_id: user_id,
-            p_contest_id: contest_id, 
-            p_team_name: team_name, 
-            p_password: password
-        })
-        
-        if(response.error){
-            return fail(500, { join_team_error : "Something went wrong" });
-        }
+    join: async ({ request, params, locals}) => {
 
-        if(response.data == "success"){
-            const redirect_url = "/contests/" + contest_id + "/my_team";
-            redirect(303, redirect_url);
-        }
+        const team_join_form = await superValidate(request, team_join_scheme);
+        if (!team_join_form.valid) return fail(400, { team_create_form: team_join_form});
 
-        return { join_team_error : response.data };
+        if(!locals.user) error(401, "You must be logged in to register for a contest");
+
+        const team_name = team_join_form.data.team_name;
+		const team_password = team_join_form.data.team_password;
+
+        const respose = await ContestRegistration.join_team_via_password(locals.user.id, params.contest_id, team_name, team_password);
+        console.log("respose", respose);
+
+        if(respose.error) return message(team_join_form, 'Something went wrong');
+        if(respose.data[0]['result'] == 'success') redirect(303, "/contests/" + params.contest_id + "/my_team");
+        return message(team_join_form, respose.data[0]['result']);
 	}
 };
