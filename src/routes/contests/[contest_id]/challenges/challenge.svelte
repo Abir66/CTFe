@@ -7,12 +7,15 @@
 	import * as Tabs from "$lib/components/ui/tabs";
 	import { Separator } from "$lib/components/ui/separator";
     import { Skeleton } from "$lib/components/ui/skeleton";
+	import { invalidateAll } from '$app/navigation';
 
 
     export let challenge_id;
     let show = 'challenge';
     let challenge;
     let challenge_loaded = false;
+    let submit_error = '';
+    let verdict = '';
 
 
     // ---------------- challenge ----------------------------
@@ -22,7 +25,34 @@
         console.log(data);
         challenge = data;
         challenge_loaded = true;
+        console.log(challenge)
     });
+
+    async function submitFlag(event){
+        const formEl = event.target as HTMLFormElement
+        const data = new FormData(formEl)
+
+        const response = await fetch(formEl.action, {
+            method: 'POST',
+            body: data
+        })
+        const responseData = await response.json()
+        
+        if(responseData.error) submit_error = responseData.error
+        else submit_error = ''
+        
+        if(responseData.submitted){
+            challenge.attempt_count += 1;
+            challenge = challenge;
+        }
+
+        if(responseData.verdict) {
+            verdict = responseData.verdict
+            if(verdict == 'correct') invalidateAll()
+        }
+    
+        formEl.reset()
+    }
 
 
     //  ------------------- hint ----------------------------
@@ -131,7 +161,16 @@
                 {/if}
 
                 
-                <form  method="POST" action="?/submitFlag" class="flex w-full gap-x-5"  >
+                {#if verdict == 'correct'}
+                    <p class="p-3 text-center rounded mt-2 text-md bg-green-500 dark:bg-green-600"><span class=" font-semibold">Correct</span></p>
+                {:else if verdict == 'incorrect'}
+                    <p class="p-3 text-center rounded mt-2 text-md text-white bg-red-600 dark:bg-red-700"><span class=" font-semibold">Incorrect</span></p>
+                {:else if submit_error}
+                    <p class="p-3 text-center rounded mt-2 text-md text-white bg-red-600 dark:bg-red-700"><span class=" font-semibold">{submit_error}</span></p>
+                {/if}
+
+                
+                <form  on:submit|preventDefault={submitFlag} method="POST" action="/api/challenges/{challenge_id}" class="flex w-full gap-x-5"  >
                     <input type="hidden" name="__superform_id"/>
                     <div class="w-3/4">
                         <Input class="border-primary"
@@ -143,13 +182,6 @@
 
                     <Button class="w-1/4" type="submit">Submit</Button>
                 </form>
-
-                <!--
-                {#if message == 'correct' && message.length > 0}
-                    <p id="filled_success_help" class="p-3 text-center rounded mt-2 text-md bg-green-500 dark:bg-green-600"><span class=" font-semibold">{message}</span></p>		
-                {:else if message.length > 0}
-                    <p id="standard_error_help" class="p-3 text-center rounded mt-2 text-md bg-red-600 dark:bg-red-700"><span class=" font-semibold">{message}</span></p>
-                {/if} -->
 
             </div>
         {/if}
