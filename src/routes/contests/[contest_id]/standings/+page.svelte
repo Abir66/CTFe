@@ -1,28 +1,39 @@
 <script lang="ts">
+    import * as Card from "$lib/components/ui/card";
     import * as Table from "$lib/components/ui/table";
     export let data;
+    console.log("here is your standing");
+    console.log(data.standings);
 
   </script>
-  
-  <Table.Root>
-    
-    <Table.Header>
-      <Table.Row>
-        <Table.Head >Place</Table.Head>
-        <Table.Head class="text-center">Team</Table.Head>
-        <Table.Head class="text-right">Points</Table.Head>
-      </Table.Row>
-    </Table.Header>
-    <Table.Body>
-      {#each  data.standings as team}
-        <Table.Row class="text-justify">
-          <Table.Cell class="font-medium">{team.place}</Table.Cell>
-          <Table.Cell  ><a href={`/contests/${data.contest_id}/${team.team_id}`} class="custom_center ">{team.team_name}</a></Table.Cell>
-          <Table.Cell class="text-right">{team.Points}</Table.Cell>
+
+<Card.Root class="p-7">
+  <Card.Content>
+    <Table.Root>
+      <Table.Header>
+        <Table.Row>
+          <Table.Head >Place</Table.Head>
+          <Table.Head class="">Team</Table.Head>
+          <Table.Head class="text-right">Points</Table.Head>
         </Table.Row>
-      {/each}
-    </Table.Body>
-  </Table.Root>
+      </Table.Header>
+      <Table.Body>
+        
+        {#each  data.standings as team,index}
+          <Table.Row class="text-justify py-0 text-lg">
+                <Table.Cell class="font-xl">{index+1}</Table.Cell>
+                <Table.Cell  ><a href={`/contests/${data.contest_id}/${team.team_id}`} class="custom_center ">{team.name}</a></Table.Cell>
+                <Table.Cell class="text-right">{team.final_score}</Table.Cell>
+
+          </Table.Row>
+        {/each}
+      </Table.Body>
+    </Table.Root>
+  </Card.Content>
+</Card.Root>
+
+  
+
 
 
   <style>
