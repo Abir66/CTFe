@@ -103,10 +103,15 @@
 					
 					
 					{#if user}
-						<Avatar.Root class="border-primary border-2 hover:invert" >
-							<!-- <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" /> -->
-							<Avatar.Fallback>{user['username'][0]}</Avatar.Fallback>
-						</Avatar.Root>
+					     <div on:click={() => {
+							goto(`/user/${user['id']}`);
+						}}>
+							<Avatar.Root class="border-primary border-2 hover:invert">
+								<!-- <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" /> -->
+								<Avatar.Fallback>{user['username'][0]}</Avatar.Fallback>
+							</Avatar.Root>
+						 </div>
+						
 						<form action="/auth/logout" method="POST" class="h-full w-full">
 							<Button variant="outline" type="submit" class="w-full hover:invert md:w-auto border-primary">Logout</Button>
 						</form>
