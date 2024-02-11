@@ -41,25 +41,20 @@
 		if (result.type === 'loaded' && result.status === 200) {
 			pushState(href, { 
 				data : result.data,
-				path : href
+				path : href,
+				authDialogueOpen : !user ? true : false
 			 });
-			// ChallengeDialogueOpen = true;
+			
 		} else {
 			goto(href);
 		}
 	}
 
-	$: if ($page.state.data && user == null) {
-		modalOpen = true;
-	} else {
-		modalOpen = false;
-	}
 </script>
 
 
-{#if modalOpen && user == null}
-	<Dialog.Root
-		open={modalOpen}
+{#if $page.state.authDialogueOpen && user == null}
+	<Dialog.Root open
 		onOpenChange={(open) => {
 			if (!open) {
 				history.back();

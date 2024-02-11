@@ -8,34 +8,41 @@
 	let ChallengeDialogueOpen = false;
 	
 	let modalDst = '';
+	import Challenge from './challenge.svelte'
+	let dialogueOpen = false;
+	let selected_challenge_id = 0;
 
 	async function showModal(challenge_id) {
-		const href = `/contests/${data.contest_id}/challenges/${challenge_id}`;
-		modalDst = href;
+		dialogueOpen = true;
+		selected_challenge_id = challenge_id;
+		// const href = `/contests/${data.contest_id}/challenges/${challenge_id}`;
+		// modalDst = href;
 
-		const result = await preloadData(href);
+		// const result = await preloadData(href);
 
-		if (result.type === 'loaded' && result.status === 200) {
-			pushState(href, { 
-				data : result.data,
-				path : href
-			});
-			// ChallengeDialogueOpen = true;
-		} else {
-			goto(href);
-		}
+		// if (result.type === 'loaded' && result.status === 200) {
+		// 	pushState(href, { 
+		// 		data : result.data,
+		// 		path : href,
+		// 		// challenge_dialogue_open : true,
+		// 	});
+		// 	// ChallengeDialogueOpen = true;
+		// } else {
+		// 	goto(href);
+		// }
 	}
 
-	$: if ($page.state.data) {
-		ChallengeDialogueOpen = true;
-	} else {
-		ChallengeDialogueOpen = false;
-	}
+	// $: if ($page.state.data) {
+	// 	ChallengeDialogueOpen = true;
+	// } else {
+	// 	ChallengeDialogueOpen = false;
+	// }
+
+	
 </script>
 
-{#if ChallengeDialogueOpen && $page.state.path && $page.state.path.includes('challenge') }
-	<Dialog.Root
-		open={ChallengeDialogueOpen}
+<!-- {#if $page.state.challenge_dialogue_open}
+	<Dialog.Root open
 		onOpenChange={(open) => {
 			if (!open) {
 				history.back();
@@ -47,7 +54,21 @@
 			<ChallengeModal data={$page.state.data} />
 		</Dialog.Content>
 	</Dialog.Root>
+{/if} -->
+{#if dialogueOpen}
+<Dialog.Root open
+	onOpenChange={(open) => {
+		if (!open) {
+			dialogueOpen = false;
+		}
+	}}
+>
+	<Dialog.Content>
+		<Challenge challenge_id={selected_challenge_id}/>
+	</Dialog.Content>
+  </Dialog.Root>
 {/if}
+
 
 {#each data.challenge_list as section (section)}
 	<div class="mb-20">
@@ -74,3 +95,4 @@
 		</div>
 	</div>
 {/each}
+

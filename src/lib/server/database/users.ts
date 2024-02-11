@@ -1,8 +1,6 @@
 import Database from "./database";
 
 async function is_registered_to_contest(contest_id,user_id) {
-
-    
     const query = `
        SELECT team_id FROM team_members WHERE user_id=$1 and contest_id=$2
     `;
