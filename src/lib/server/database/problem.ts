@@ -72,11 +72,21 @@ async function get_problem(problem_id, user_id){
     return result;
 }
 
+async function submit_flag(problem_id, user_id, flag, variation_id = -1){
+    const query = `
+        SELECT submit_flag($1, $2, $3, $4) as submit_response;
+    `;
+    const params = [problem_id, user_id, flag, variation_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 export default 
 {
     get_specific_problem_variation,
     get_any_problem_variation,
     get_problem_status,
     get_problem_access,
-    get_problem
+    get_problem,
+    submit_flag
 }
