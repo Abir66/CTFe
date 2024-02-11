@@ -114,12 +114,20 @@ async function get_contest_type(contest_id) {
     return result;
 }
 
+async function get_contest_access(contest_id, user_id) {
+    const query = `SELECT get_contest_access($1, $2) as access;`;
+    const params = [contest_id, user_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 export default {
     get_contest_list,
     get_contest_details,
     get_contest_organizers,
     get_contest_teams_shortlist,
     get_registration_eligibility,
-    get_contest_type
+    get_contest_type,
+    get_contest_access
 }
 

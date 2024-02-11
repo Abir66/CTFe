@@ -57,37 +57,19 @@ async function get_problem_status(contest_id,problem_id,team_id){
     let result = await Database.run_query(query, params);
     return result.data[0].exists;
 }
-async function get_all_problems_of_contest(contest_id,team_id){
-    const query =`SELECT 
-    json_agg(json_build_object(
-        'category', category,
-        'challenges', challenges
-    ))
 
-FROM (
-    SELECT 
-        category, 
-        json_agg(json_build_object(
-            'id', cp.id,
-            'title', cp.title,
-            'score', cp.score,
-            'status', 
-            CASE 
-                WHEN s.id IS NOT NULL THEN 'solved'
-                ELSE 'unsolved'
-            END
-        )) AS challenges
-    FROM contest_problems cp
-    LEFT JOIN solves s ON cp.id = s.problem_id AND s.team_id = $2
-    WHERE cp.contest_id = $1
-    GROUP BY category
-) subquery`
-
-    const params = [contest_id,team_id];
+async function get_problem_access(problem_id, user_id){
+    const query = `SELECT get_problem_access($1, $2) as access;`;
+    const params = [problem_id, user_id];
     let result = await Database.run_query(query, params);
-    // console.log(result.data[0].json_agg);
-    return result.data[0].json_agg;
+    return result;
+}
 
+async function get_problem(problem_id, user_id){
+    const query = `SELECT get_problem($1, $2) as problem;`;
+    const params = [problem_id, user_id];
+    let result = await Database.run_query(query, params);
+    return result;
 }
 
 export default 
@@ -95,5 +77,6 @@ export default
     get_specific_problem_variation,
     get_any_problem_variation,
     get_problem_status,
-    get_all_problems_of_contest
+    get_problem_access,
+    get_problem
 }
