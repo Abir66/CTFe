@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import standings from '$lib/server/database/contest_standings';
 export const load =  async (serverLoadEvent) => {
     const {fetch} = serverLoadEvent;
     const contest_id = serverLoadEvent.params.contest_id;
@@ -16,12 +17,10 @@ export const load =  async (serverLoadEvent) => {
             error(403, "Contest not started yet");
         }
     }
-    const response = await fetch("/dummyAPI/contests/"+contest_id+"/standings"); // error 404?
-    const data = await response.json();
-    data.sort((a,b) => a.place - b.place);
-    console.log(data);
+    let standings_data = await standings.get_team_standings(contest_id);
+    console.log(standings_data);
 	return {
-        standings: data,
+        standings: standings_data.data,
         contest_id: contest_id
 	};
 }
