@@ -51,10 +51,17 @@ export const load = async ({url,fetch,params,locals}) => {
         challenge_list_response = await contest_problems.get_problems_for_participant(contest_id, team_id, contest_access['contest_status']);
     }
 
+    else if(contest_access['access'] == 'restricted') 
+    {
+        return error(403, 'Access Denied');
+    }
+
     console.log(challenge_list_response);
         
     if(!challenge_list_response.success) return error(500, 'Something went wrong2');
-    const challenge_list = challenge_list_response.data[0].json_agg;
+    let challenge_list = challenge_list_response.data[0].json_agg;
+
+    if (!challenge_list) challenge_list = []
     console.log(challenge_list);
 
     return {

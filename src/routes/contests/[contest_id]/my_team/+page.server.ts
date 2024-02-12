@@ -5,7 +5,6 @@ import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import { fail } from '@sveltejs/kit';
 
-
 let contest_id = "";
 let user_id = 0;
 let team_id = 0;
