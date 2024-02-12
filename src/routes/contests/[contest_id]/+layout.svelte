@@ -2,8 +2,13 @@
     import {onMount} from 'svelte';
     import {page} from "$app/stores";
     import { Separator } from "$lib/components/ui/separator";
+    import { Button, buttonVariants } from "$lib/components/ui/button";
+    import * as Dialog from "$lib/components/ui/dialog";
+    import { Skeleton } from "$lib/components/ui/skeleton";
+    import { goto } from '$app/navigation';
 
-    
+    import { Input } from "$lib/components/ui/input";
+    import { Label } from "$lib/components/ui/label";
     export let data;
     const contest_name = data.contest.contest_name;
     const contest_id = data.contest_id;
@@ -59,6 +64,27 @@
         selected='announcements';
     }
 
+    let loaded = false;
+    let keys = [];
+    $: team_data = [{username: "loading",score:0}];
+    let team_response = {};
+    async function loadTeamInfo(){
+            console.log("loading team info");
+            if(!loaded){
+                const response = await fetch(`/api/my_team/${contest_id}`);
+                team_response = await response.json();
+                team_data = team_response.data;
+                console.log(team_response)
+                loaded = true;
+            }
+            
+            // hints = hints_response['hints'];
+            // locked_hints = hints_response['locked_hints'];
+            // hintLoaded = true;
+        
+	}
+
+
 
 </script>
 <div class="flex flex-col sm:flex-row justify-between">
@@ -90,12 +116,46 @@
         {/if}
         <a href="/contests/{contest_id}/announcements" class:active={selected==="announcements"} on:click={()=>{selected="announcements"}}>Announcements</a>
     </div>
+    <Dialog.Root>
+        <Dialog.Trigger class="" on:click ={()=>{loadTeamInfo()}}>My Team</Dialog.Trigger>
+        <Dialog.Content class="sm:max-w-[425px]">
+          <Dialog.Header>
+            <Dialog.Title>Team Name</Dialog.Title>
+          </Dialog.Header>
+          <div class="grid gap-4 py-4">
+
+            
+                {#if loaded}
+                    {#each Object.keys(team_data) as key,index}
+                        <div class="flex justify-between">
+                            <p class="">{index+1}</p>
+                            <p class="">{team_data[key].name}</p>
+                            <p class="">{team_data[key].score}</p> 
+                        </div>
+                    {/each}
+                {:else}
+                <div class="flex flex-col space-y-5">
+                    <Skeleton class="h-5 w-full" />
+                    <Skeleton class="h-10 w-full" />
+                    <Skeleton class="h-5 w-full" />
+                </div>
+                {/if}
+            
+          </div>
+          <Dialog.Footer>
+            <Button type="submit"  class="w-full" >Show Details</Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Root>
     {#if data.contest.access == 'participant'}
         <a href="/contests/{contest_id}/my_team">My Team</a>
     {:else if data.contest.access == 'organizer'}
         <a href="/contests/{contest_id}/admin">Admin Panel</a>
     {/if}
+
 </div>
+
+
 
 <slot />
 

@@ -44,14 +44,14 @@
 
 {#if total_clarifications > 0}
     {#each data.clarifications as clarifications}
-        <Card.Root class="my-4 hover:cursor-pointer hover:bg-slate-400 hover:dark:bg-gray-900" on:click={() => goto(`/contests/${data.contest_id}/clarifications/${clarifications.id}`)} >
+        <Card.Root class="my-4"  >
             <Card.Header >
                 <Card.Title class=" py-2">
                 <div class="text-xl lg:flex">
-                    <div class="div">{clarifications.title}&nbsp;</div>
+                    <div class="divhover:cursor-pointer hover:bg-slate-400 hover:dark:bg-gray-900 hover:cursor-pointer" on:click={(e) => goto(`/contests/${data.contest_id}/clarifications/${clarifications.id}`)}>{clarifications.title}&nbsp;</div>
                     <div class="text-sm text-gray-600 py-1 dark:text-gray-100 ">({change_date_format(clarifications.time)})</div>
                 </div>
-                <div class="text-sm font-thin text-gray-800 py-1 dark:text-gray-200">{clarifications.username}</div>    
+                <div class="text-sm font-thin text-gray-800 py-1 dark:text-gray-200 hover:underline hover:cursor-pointer" on:click={(e)=>{goto(`/user/${clarifications.user_id}`)}} >{clarifications.username}</div>    
             </Card.Title>
             </Card.Header>
         </Card.Root>

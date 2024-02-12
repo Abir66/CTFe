@@ -3,8 +3,10 @@
     import { Input } from "$lib/components/ui/input";
     import { Label } from "$lib/components/ui/label";
     import { Button } from "$lib/components/ui/button";
+	import { goto } from "$app/navigation";
     export let data;
     let title = "";
+    console.log(data);
     function change_date_format(date){
         let d = new Date(date);
         return d.toDateString() + " " + d.toLocaleTimeString();
@@ -17,7 +19,7 @@
             {#each data.thread_chat as chat}
                 <Card.Root class="my-2">
                     <Card.Header>
-                    <Card.Title>{chat.username}</Card.Title>
+                    <Card.Title ><span class="hover:underline hover:cursor-pointer" on:click={()=>{goto(`/user/${chat.user_id}`)}}>{chat.username}</span></Card.Title>
                     <Card.Description>{change_date_format(chat.time)}</Card.Description>
                     </Card.Header>
                     <Card.Content>
