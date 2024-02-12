@@ -37,6 +37,6 @@ export async function GET({ locals,params }) {
         usersDict[member.user_id].score = member.sum;
     });
 
-    return json({ success: true, data: usersDict })
+    return json({ success: true,name:team_info.name, data: usersDict })
 
 }
