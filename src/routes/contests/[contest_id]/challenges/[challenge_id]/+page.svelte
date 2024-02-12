@@ -54,7 +54,7 @@
 
 		
 
-		<form use:enhance method="POST" action="?/submitFlag" class="flex w-full gap-x-5"  >
+		<form use:enhance method="POST" action="?/submitTilte" class="flex w-full gap-x-5"  >
 			<input type="hidden" name="__superform_id"/>
 			<div class="w-3/4">
 				<Input class="border-primary"

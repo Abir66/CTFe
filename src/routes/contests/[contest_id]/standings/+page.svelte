@@ -2,8 +2,9 @@
     import * as Card from "$lib/components/ui/card";
     import * as Table from "$lib/components/ui/table";
     export let data;
-    console.log("here is your standing");
-    console.log(data.standings);
+    import { goto } from '$app/navigation';
+    console.log(data);
+
 
   </script>
 
@@ -20,11 +21,10 @@
       <Table.Body>
         
         {#each  data.standings as team,index}
-          <Table.Row class="text-justify py-0 text-lg">
+          <Table.Row class="text-justify py-0 text-lg" >
                 <Table.Cell class="font-xl">{index+1}</Table.Cell>
-                <Table.Cell  ><a href={`/contests/${data.contest_id}/${team.team_id}`} class="custom_center ">{team.name}</a></Table.Cell>
+                <Table.Cell  ><a href={`/teams/${team.team_id}`} class="custom_center ">{team.name}</a></Table.Cell>
                 <Table.Cell class="text-right">{team.final_score}</Table.Cell>
-
           </Table.Row>
         {/each}
       </Table.Body>
