@@ -6,7 +6,7 @@ async function get_clarifications(user_id,contest_id){
     let team_id = await get_team_id(user_id,contest_id);
     team_id = team_id.data[0].id;
     const query = `
-        select contest_threads.id,contest_threads.title,contest_threads.created_at as time,users.username 
+        select contest_threads.id,contest_threads.title,contest_threads.created_at as time,users.username,users.id as user_id 
         from contest_threads
         join team_members on team_members.user_id = contest_threads.user_id
         join users on users.id = team_members.user_id
@@ -121,6 +121,7 @@ export default {
     add_clarification,
     get_clarification_chats,
     get_clarification,
-    add_thread_chat
+    add_thread_chat,
+    get_team_id
 
 }

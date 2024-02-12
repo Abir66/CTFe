@@ -7,6 +7,7 @@ export const load =  async (serverLoadEvent) => {
     const {fetch,locals} = serverLoadEvent;
     const contest_id = serverLoadEvent.params.contest_id;
     let result = await clarifications.get_clarifications(locals.user.id,contest_id);
+    console.log(result.data);
 	return {
         clarifications: result.data,
         contest_id: contest_id
