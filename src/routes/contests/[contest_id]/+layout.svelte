@@ -9,6 +9,8 @@
 
     import { Input } from "$lib/components/ui/input";
     import { Label } from "$lib/components/ui/label";
+    import * as Drawer from "$lib/components/ui/drawer";
+    import TeamSummary from "./team_summary.svelte";
     export let data;
     const contest_name = data.contest.contest_name;
     const contest_id = data.contest_id;
@@ -64,29 +66,34 @@
         selected='announcements';
     }
 
-    let loaded = false;
-    let keys = [];
-    $: team_data = [{username: "loading",score:0}];
-    let team_response = {};
-    async function loadTeamInfo(){
-            console.log("loading team info");
-            if(!loaded){
-                const response = await fetch(`/api/my_team/${contest_id}`);
-                team_response = await response.json();
-                team_data = team_response.data;
-                console.log(team_response)
-                loaded = true;
-            }
-            
-            // hints = hints_response['hints'];
-            // locked_hints = hints_response['locked_hints'];
-            // hintLoaded = true;
-        
-	}
+    let summaryopen = false;
 
+    async function showSummary(){
+        summaryopen = true;
+    }
 
-
+    
 </script>
+
+{#if summaryopen}
+<Drawer.Root open 
+    onOpenChange={(open) => {
+        if (!open) { summaryopen = false; }
+    }}>
+    
+    <Drawer.Content>
+        <div class="w-full">
+            <TeamSummary contest_id={contest_id} />
+        </div>
+        <Drawer.Footer class="mx-auto w-full max-w-sm mb-5">
+            <a target="_blank" href="/contests/{contest_id}/my_team" class="w-full rounded-md p-2 text-center bg-primary text-secondary">Go To Details</a>
+        </Drawer.Footer>
+    </Drawer.Content>
+</Drawer.Root>
+{/if}
+
+
+
 <div class="flex flex-col sm:flex-row justify-between">
     <h1 class="scroll-m-20 mt-5 py-2 text-3xl font-extrabold">
         {contest_name}
@@ -116,42 +123,12 @@
         {/if}
         <a href="/contests/{contest_id}/announcements" class:active={selected==="announcements"} on:click={()=>{selected="announcements"}}>Announcements</a>
     </div>
-    <Dialog.Root>
-        <Dialog.Trigger class="" on:click ={()=>{loadTeamInfo()}}>My Team</Dialog.Trigger>
-        <Dialog.Content class="sm:max-w-[425px]">
-          <Dialog.Header>
-            <Dialog.Title>Team Name</Dialog.Title>
-          </Dialog.Header>
-          <div class="grid gap-4 py-4">
 
-            
-                {#if loaded}
-                    {#each Object.keys(team_data) as key,index}
-                        <div class="flex justify-between">
-                            <p class="">{index+1}</p>
-                            <p class="">{team_data[key].name}</p>
-                            <p class="">{team_data[key].score}</p> 
-                        </div>
-                    {/each}
-                {:else}
-                <div class="flex flex-col space-y-5">
-                    <Skeleton class="h-5 w-full" />
-                    <Skeleton class="h-10 w-full" />
-                    <Skeleton class="h-5 w-full" />
-                </div>
-                {/if}
-            
-          </div>
-          <Dialog.Footer>
-            <Button class="w-full" on:click={()=>{goto(`/contests/${contest_id}/my_team`)}}>Show Details</Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog.Root>
-    <!-- {#if data.contest.access == 'participant'}
-        <a href="/contests/{contest_id}/my_team">My Team</a>
+    {#if data.contest.access == 'participant'}
+        <button on:click={showSummary}>My Team</button>
     {:else if data.contest.access == 'organizer'}
         <a href="/contests/{contest_id}/admin">Admin Panel</a>
-    {/if} -->
+    {/if}
 
 </div>
 
@@ -159,11 +136,9 @@
 
 <slot />
 
-
 <style>
     .active{
         border-bottom: 2px solid black;
         padding-bottom: 8px;
     }
-    
 </style>
