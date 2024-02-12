@@ -88,8 +88,8 @@
                 <Table.Row  class="">
                     <Table.Cell class="py-4 font-medium">{index+1}</Table.Cell>
                     <Table.Cell class="py-4 font-medium">{data.title}</Table.Cell>
-                    <Table.Cell>{data.username}</Table.Cell>
                     <Table.Cell>{data.category}</Table.Cell>
+                    <Table.Cell>{data.username}</Table.Cell>
                 </Table.Row>
             {/each}
         </Table.Body>
