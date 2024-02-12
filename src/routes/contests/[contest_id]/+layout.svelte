@@ -86,7 +86,7 @@
             <TeamSummary contest_id={contest_id} />
         </div>
         <Drawer.Footer class="mx-auto w-full max-w-sm mb-5">
-            <a target="_blank" href="/contests/{contest_id}/my_team" class="w-full rounded-md p-2 text-center bg-primary text-secondary">Go To Details</a>
+            <a target="_self" href="/contests/{contest_id}/my_team" class="w-full rounded-md p-2 text-center bg-primary text-secondary">Go To Details</a>
         </Drawer.Footer>
     </Drawer.Content>
 </Drawer.Root>
