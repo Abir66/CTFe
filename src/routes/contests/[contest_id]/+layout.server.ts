@@ -1,15 +1,14 @@
 import { error } from '@sveltejs/kit';
+import contest from '$lib/server/database/contest.js';
 
 
 export const load = async ({params,locals}) => {
     const contest_id = params.contest_id;
-	const response  = await locals.supabase
-		.from('contests')
-		.select('id, start_time, end_time, contest_name, memberlimit, type')
-		.eq('id', contest_id)
+    const user_id = locals.user ? locals.user.id : 0;
+	const response  = await contest.get_contest_layout_data(contest_id, user_id);
 
-    
     if(response.error){
+        console.log(response.error);
         return error(500, "something went wrong");
     }
 
@@ -17,30 +16,11 @@ export const load = async ({params,locals}) => {
         return error(404, "contest not found");
     }
 
-    const data = {
-        contest : response.data[0],
-        user : locals.user
+    console.log(response.data[0].layout_data);
+
+    return {
+        contest : response.data[0].layout_data,
+        contest_id : contest_id
     }
 
-    if(locals.user){
-        const user_id = locals.user.id;
-
-        const response = await locals.supabase
-            .from('team_members')
-            .select(`
-                team_id,
-                teams (leader_id, name)
-            `)
-            .eq('contest_id', contest_id)
-            .eq('user_id', user_id)
-        if(response.data != null && response.data.length != 0){
-            data['team'] = {
-                id : response.data[0].team_id,
-                name : response.data[0].teams['name'],
-                leader : user_id == response.data[0].teams['leader_id'],
-            }
-        }
-    }
-
-    return data
 }
