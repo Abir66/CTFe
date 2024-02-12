@@ -1,6 +1,8 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import type { Actions, PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
+import teams from '$lib/server/database/teams';
+import contest_clarification from '$lib/server/database/contest_clarification';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import { fail } from '@sveltejs/kit';
@@ -22,30 +24,20 @@ export const load: PageServerLoad = async ({params,locals}) => {
     }
     contest_id = params.contest_id;
     user_id = locals.user.id;
-    const supabase = locals.supabase;
-    
-    let { data:id_leader_data, error:id_leader_error } = await supabase.rpc('get_team_id_and_leader', {c_id: contest_id, u_id: user_id})
-    if (id_leader_error){
-        console.error(id_leader_error)
-        fail(500, { id_leader_error });
-    }
-    leader_id = id_leader_data[0].leader;
-    team_id = id_leader_data[0].id;
 
+    let result = await contest_clarification.get_team_id(user_id,contest_id);
+    team_id = result.data[0].id;
 
-    let { data:team_members_data, error:team_members_error } = await supabase.rpc('get_team_members', {c_id:contest_id, t_id:team_id})
-    if (team_members_error) {
-        console.error(team_members_error)
-        fail(500, { team_members_error });
-    }
-    team_members = team_members_data;
+    result = await teams.get_team_info(team_id);
+    console.log(result);
+    leader_id = result.data[0].leader_id;
+    const team_name = result.data[0].name;
 
+    result = await teams.get_team_members(team_id);
+    team_members = result.data;
 
-    let { data:member_limit_data, error:member_limit_error } = await supabase.rpc('get_contest_member_limit', {c_id:contest_id})
-    if (member_limit_error) {
-        fail(500, { member_limit_error });
-    }
-    contest_member_limit = member_limit_data;
+    result = await teams.get_member_limit(contest_id);
+    contest_member_limit = result.data[0].memberlimit;
 
 
     return {
@@ -54,7 +46,8 @@ export const load: PageServerLoad = async ({params,locals}) => {
             team_id,
             leader_id,
             contest_member_limit,
-            error_message
+            error_message,
+            team_name
         }
     }
 }

@@ -3,17 +3,19 @@
 	import { enhance } from '$app/forms';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+    import { page } from "$app/stores";
 
 
     export let data;
     // export let form;
+    console.log(data);
     const team_members = data.props.team_members;
     const team_id = data.props.team_id;
     const leader_id = data.props.leader_id;
     const member_limit = data.props.contest_member_limit;
 </script>
 
-<h1 class="text-3xl font-bold mb-5">{data['team']['name'].toUpperCase()}</h1>
+<h1 class="text-3xl font-bold mb-5">{data.props.team_name.toUpperCase()}</h1>
 
 
 <div class="w-full md:w-1/2 py-10">
@@ -44,7 +46,8 @@
     </form>
 {/if}
 
-{#if data['team'].leader}
+{#if data.props.leader_id == $page.data.user.id}
+
 -------------------
     team leader section.
     add password and delete team option here

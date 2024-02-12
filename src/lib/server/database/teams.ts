@@ -58,6 +58,17 @@ async function get_total_submission_count(team_id){
 
 }
 
+async function get_member_limit(contest_id){
+    const query = `
+        select memberlimit from contests
+        where id = $1
+    `
+    const params = [contest_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+
 
 
 export default {
@@ -65,5 +76,6 @@ export default {
     get_team_members,
     get_team_member_score,
     get_solves,
-    get_total_submission_count
+    get_total_submission_count,
+    get_member_limit
 }

@@ -143,15 +143,15 @@
             
           </div>
           <Dialog.Footer>
-            <Button type="submit"  class="w-full" >Show Details</Button>
+            <Button class="w-full" on:click={()=>{goto(`/contests/${contest_id}/my_team`)}}>Show Details</Button>
           </Dialog.Footer>
         </Dialog.Content>
       </Dialog.Root>
-    {#if data.contest.access == 'participant'}
+    <!-- {#if data.contest.access == 'participant'}
         <a href="/contests/{contest_id}/my_team">My Team</a>
     {:else if data.contest.access == 'organizer'}
         <a href="/contests/{contest_id}/admin">Admin Panel</a>
-    {/if}
+    {/if} -->
 
 </div>
 
