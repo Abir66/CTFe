@@ -58,7 +58,6 @@ async function get_contest_details(contest_id) {
     `;
     const params = [contest_id];
     let result = await Database.run_query(query, params);
-   
     return result;
 }
 
@@ -195,6 +194,17 @@ async function get_team_list(contest_id, team_name=''){
     return result;
 }
 
+async function update_contest_description(contest_id, description){
+    let query = `
+        UPDATE contests
+        SET description = $2
+        WHERE id = $1
+    `;
+    let params = [contest_id, description];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
 export default {
     get_contest_list,
     get_contest_details,
@@ -206,6 +216,7 @@ export default {
     get_contest_layout_data,
     get_private_contest_access,
     get_participant_list,
-    get_team_list
+    get_team_list,
+    update_contest_description
 }
 
