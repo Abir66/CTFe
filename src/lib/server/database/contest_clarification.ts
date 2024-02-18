@@ -1,6 +1,67 @@
 import Database from './database'
 
 
+async function get_clarifications_organizer(user_id,contest_id){
+    const query = `
+        select ct.id, ct.title, ct.team_id, ct.user_id, users.username, ct.status, ct.created_at as time
+        from contest_threads as ct
+        join users on users.id = ct.user_id
+        where contest_id = $1
+        order by last_updated desc
+    `;
+    let result = await Database.run_query(query, [contest_id]);
+    return result;
+
+}
+
+async function get_clarification_chats_organizer(user_id,contest_id,thread_id){
+    const query = `
+        select contest_threads_chats.id,contest_threads_chats.user_id,users.username,contest_threads_chats.created_at as time,contest_threads_chats.text,contest_threads_chats.image from contest_threads_chats
+        join contest_threads on contest_threads.id = contest_threads_chats.thread_id
+        join users on users.id = contest_threads_chats.user_id
+        where contest_id = $1 and thread_id = $2
+    `;
+    const params = [contest_id,thread_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+async function get_clarification_organizer(contest_id,thread_id){
+    const query = `
+        select contest_threads.id,contest_threads.title,contest_threads.created_at as time,users.username 
+        from contest_threads
+        join team_members on team_members.user_id = contest_threads.user_id
+        join users on users.id = team_members.user_id
+        and team_members.contest_id = $1
+        and contest_threads.id = $2
+    `;
+    const params = [contest_id,thread_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+async function add_thread_chat_organizer(user_id,contest_id,thread_id,text,image){
+    let image_url = null;
+    const query = `
+        insert into contest_threads_chats(user_id,text,image,thread_id)
+        values($1,$2,$3,$4)
+    `;
+    const params = [user_id,text,image_url,thread_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+async function update_organizer_seen(thread_id){
+    const query = `
+        update contest_threads
+        set status = 'false'
+        where id = $1
+    `;
+    const params = [thread_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 
 async function get_clarifications(user_id,contest_id){
     let team_id = await get_team_id(user_id,contest_id);
@@ -53,7 +114,6 @@ async function add_clarification(user_id,contest_id,title){
 
 async function get_clarification_chats(user_id,contest_id,thread_id){
     let allowed = await is_allowed(user_id,contest_id,thread_id);
-    console.log(allowed);
     if(allowed.data[0].exists == false){
         return null;
     }
@@ -65,9 +125,10 @@ async function get_clarification_chats(user_id,contest_id,thread_id){
     `;
     const params = [contest_id,thread_id];
     let result = await Database.run_query(query, params);
-    console.log(result);
     return result;
 }
+
+
 
 async function is_allowed(user_id,contest_id,thread_id){
     let team_id = await get_team_id(user_id,contest_id);
@@ -122,6 +183,11 @@ export default {
     get_clarification_chats,
     get_clarification,
     add_thread_chat,
-    get_team_id
+    get_team_id,
+    get_clarifications_organizer,
+    get_clarification_chats_organizer,
+    get_clarification_organizer,
+    update_organizer_seen,
+    add_thread_chat_organizer
 
 }

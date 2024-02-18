@@ -4,7 +4,10 @@
     import { Label } from "$lib/components/ui/label";
     import { Button } from "$lib/components/ui/button";
 	import { goto } from "$app/navigation";
+
+
     export let data;
+    console.log(data.thread_chat);
     let title = "";
     function change_date_format(date){
         let d = new Date(date);
@@ -32,10 +35,11 @@
 {:else}
     <h1>Clarification no</h1>
 {/if}
-<form method="POST" action="?/sendQues" class="px-5"  >
+
+<form method="POST" action="?/sendClarify" class="px-5"  >
     <div class="grid gap-4 py-4">
         <div class="grid grid-cols-4 items-center">
-        <Input name="chat" id="name" bind:value={title} placeholder="enter questions" class="col-span-3" />
+        <Input name="chat" id="name" bind:value={title} placeholder="Clarify something" class="col-span-3" />
         <Button type="submit" class="grid-cols-1 ml-4">Send</Button>
     </div>
         
