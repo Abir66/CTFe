@@ -35,7 +35,6 @@ export const actions: Actions = {
         const formdata = await request.formData();
         const chat_data = formdata.get('chat');
         let status = await clarifications.add_thread_chat(locals.user.id,params.contest_id,params.clarification_id,chat_data,null);
-        console.log(status);
         if(status?.success){
             redirect(301, '/contests/'+params.contest_id+'/clarifications/'+params.clarification_id);
         }
