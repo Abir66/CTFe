@@ -7,6 +7,8 @@
 	export let data ;
 	import { LockClosed } from 'radix-icons-svelte';
 	import { StarFilled } from 'radix-icons-svelte';
+	
+	
 	import { goto } from '$app/navigation';
 
 	const contest_types = [
