@@ -36,8 +36,7 @@ export const load = async ({params, locals}) => {
 		// if(data.already_registered) data.team_id = registration_eligibility.data[0].registration_eligibility.team_id;
 	}
 
-	console.log(data)
-	
+
 	return data;
 
 }
