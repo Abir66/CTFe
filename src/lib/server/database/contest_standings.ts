@@ -26,7 +26,67 @@ async function get_team_standings(contest_id){
 }
 
 
+async function get_standings_organizer_view(contest_id, team_name='', show_banned=false){
+  let query = `
+          WITH TeamRanks AS (
+            SELECT 
+                team_id,
+                name,
+                COALESCE(time_diff, 0) AS time_diff,
+                final_score,
+                hint_penalty,
+                status,
+                solve_count,
+                RANK() OVER (ORDER BY final_score DESC) AS rank
+            FROM (
+                SELECT 
+                    t.id AS team_id,
+                    t.name,
+                    t.status,
+                    SUM(EXTRACT(EPOCH FROM (cs.created_at - c.start_time)) / 60)::INT AS time_diff,
+                    SUM(COALESCE(cp.score,0) - COALESCE(h.hints_score, 0)) AS final_score,
+                    COALESCE(SUM(h.hints_score), 0) AS hint_penalty,
+                    COUNT(cs.problem_id) AS solve_count
+                FROM 
+                    teams t
+                LEFT JOIN contest_solves cs ON t.id = cs.team_id
+                LEFT JOIN contest_problems cp ON cs.problem_id = cp.id
+                LEFT JOIN contests c ON cp.contest_id = c.id
+                LEFT JOIN (
+                    SELECT 
+                        hu.team_id,
+                        h.problem_id,
+                        SUM(h.penalty_score) AS hints_score
+                    FROM 
+                        hint_unlocks hu
+                    JOIN hints h ON hu.hint_id = h.id
+                    GROUP BY 
+                        hu.team_id, h.problem_id
+                ) h ON t.id = h.team_id AND cp.id = h.problem_id
+                WHERE 
+                    t.contest_id = $1 ${show_banned ? '' : "AND (t.status is null or t.status <> 'banned' )"}
+                GROUP BY 
+                    t.id, t.name, t.status
+            ) AS subquery
+        )
+        SELECT 
+            *
+        FROM 
+            TeamRanks
+        WHERE 
+            name ILIKE '%' || $2 || '%'
+        ORDER BY 
+            rank,
+            time_diff ASC,
+            lower(name) ASC; 
+  `
+  let params = [contest_id, team_name];
+  const result = await Database.run_query(query, params);
+  return result;
+}
+
 
 export default {
     get_team_standings,
+    get_standings_organizer_view
 }

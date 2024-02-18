@@ -26,18 +26,18 @@
 			<Table.Header>
 				<Table.Row>
 					<Table.Head>Team name</Table.Head>
-					<Table.Head>Members</Table.Head>
-                    <Table.Head>Solves</Table.Head>
-					<Table.Head class="text-right">Score</Table.Head>
+					<Table.Head class="text-right">Members</Table.Head>
+                    <!-- <Table.Head>Solves</Table.Head>
+					<Table.Head class="text-right">Score</Table.Head> -->
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
 				{#each data.teams as team (team.id)}
                     <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-500 bg-opacity-50 dark:bg-opacity-15' : ''}">
                         <Table.Cell class="py-4 font-medium">{team.name}</Table.Cell>
-                        <Table.Cell>{team.member_count}</Table.Cell>
-                        <Table.Cell>{team.solve_count}</Table.Cell>
-                        <Table.Cell class="text-right">{team.total_score}</Table.Cell>
+                        <Table.Cell class="text-right">{team.member_count}</Table.Cell>
+                        <!-- <Table.Cell>{team.solve_count}</Table.Cell>
+                        <Table.Cell class="text-right">{team.total_score}</Table.Cell> -->
                     </Table.Row>
 				{/each}
 			</Table.Body>
