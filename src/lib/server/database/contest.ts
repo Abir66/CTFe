@@ -195,42 +195,6 @@ async function get_team_list(contest_id, team_name=''){
     return result;
 }
 
-async function get_team_list_with_score(contest_id, team_name = ''){
-    console.log(contest_id, team_name)
-    let query= `
-        SELECT 
-            t.id,
-            t.name,
-            t.status,
-            COUNT(DISTINCT tm.user_id) AS member_count,
-            COUNT(DISTINCT cs.problem_id) AS solve_count,
-            COALESCE(SUM(cp.score), 0) - COALESCE(SUM(h.penalty_score), 0) AS total_score
-        FROM 
-            teams t
-        LEFT JOIN 
-            team_members tm ON t.id = tm.team_id
-        LEFT JOIN 
-            contest_solves cs ON tm.user_id = cs.user_id AND t.contest_id = cs.contest_id
-        LEFT JOIN 
-            contest_problems cp ON cs.problem_id = cp.id AND t.contest_id = cp.contest_id
-        LEFT JOIN 
-            hint_unlocks hu ON t.id = hu.team_id
-        LEFT JOIN 
-            hints h ON hu.hint_id = h.id
-        WHERE 
-            t.contest_id = $1 ${team_name!=''  ? "AND t.name ILIKE '%' || $2 || '%'" : ""}
-        GROUP BY 
-            t.id, t.name, t.status
-        ORDER
-            BY LOWER(t.name)
-    `
-    let params = [contest_id];
-    if(team_name!='') params.push(team_name);
-    const result = await Database.run_query(query, params);
-    return result;
-}
-    
-
 export default {
     get_contest_list,
     get_contest_details,
@@ -242,7 +206,6 @@ export default {
     get_contest_layout_data,
     get_private_contest_access,
     get_participant_list,
-    get_team_list,
-    get_team_list_with_score
+    get_team_list
 }
 
