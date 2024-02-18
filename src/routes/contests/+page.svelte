@@ -10,7 +10,7 @@
 	
 	
 	import { goto } from '$app/navigation';
-
+    import { page } from '$app/stores';
 	const contest_types = [
 		{ value: 'all', label: 'All' },
 		{ value: 'public', label: 'Public' },
@@ -32,9 +32,20 @@ const get_time = (duration) => {
 	return `${hours}h : ${minutes}m `;
 };
 
+const go_to_create_contest = () => {
+	goto('/contests/create_contest');
+};
 </script>
 
-<h1 class="py-5 text-4xl font-bold">Contests</h1>
+<div class="flex justify-start items-center">
+	<h1 class="py-5 text-4xl font-bold mr-8">Contests</h1> 
+	{#if $page.data.user}
+	<Button class="rounded-full hover:scale-105 hover:shadow-slate-400 hover:shadow-md " on:click={go_to_create_contest}>+</Button>
+	{/if}
+</div>
+
+
+
 
 <form
   action="/contests"
