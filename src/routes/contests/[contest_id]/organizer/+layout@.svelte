@@ -55,7 +55,7 @@
         {name: "Statistics", link: "/contests/"+contest_id+"/organizer/statistics"},
         {name: "Announcements", link: "/contests/"+contest_id+"/organizer/announcements"},
         {name: "Clarifications", link: "/contests/"+contest_id+"/organizer/clarifications"},
-        {name: "Users", link: "/contests/"+contest_id+"/organizer/users"},
+        {name: "Participants", link: "/contests/"+contest_id+"/organizer/participants"},
         {name: "Teams", link: "/contests/"+contest_id+"/organizer/teams"},
         {name: "Scoreboard", link: "/contests/"+contest_id+"/organizer/scoreboard"},
         {name: "Submissions", link: "/contests/"+contest_id+"/organizer/submissions"},
@@ -112,7 +112,7 @@
             <a class="w-full section hover:bg-primary hover:text-secondary" href={section.link}>{section.name}</a>
         {/each}
     </div>
-    <div class="w-full">
+    <div class="w-full sm:px-5 py-5">
         <slot />
     </div>
 </div>

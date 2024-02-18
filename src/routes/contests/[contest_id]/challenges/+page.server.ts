@@ -7,7 +7,7 @@ export const load = async ({url,fetch,params,locals}) => {
     const user_id = locals.user ? locals.user.id : 0
 
     let contest_access = await Contest.get_contest_access(contest_id, user_id);
-    if(!contest_access.success) return error(500, 'Something went wrong1');
+    if(!contest_access.success) return error(500, 'Something went wrong');
 
     contest_access = contest_access.data[0].access;
 

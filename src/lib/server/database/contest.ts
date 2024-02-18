@@ -138,6 +138,39 @@ async function get_private_contest_access(contest_id, user_id, password) {
     return result;
 }
 
+async function get_participant_list(contest_id, username=''){
+    let query = `
+    SELECT 
+        tm.team_id,
+        tm.user_id,
+        u.username,
+        t.name AS team_name,
+        COALESCE(SUM(cp.score), 0) AS total_score,
+        COALESCE(COUNT(cs.problem_id), 0) AS solve_count
+    FROM 
+        team_members tm
+    INNER JOIN 
+        users u ON tm.user_id = u.id
+    INNER JOIN 
+        teams t ON tm.team_id = t.id
+    LEFT JOIN 
+        contest_solves cs ON tm.user_id = cs.user_id AND tm.contest_id = cs.contest_id
+    LEFT JOIN 
+        contest_problems cp ON cs.problem_id = cp.id AND tm.contest_id = cp.contest_id
+    WHERE 
+        tm.contest_id = $1 ${username!=''  ? "AND u.username LIKE '%' || $2 || '%'" : ""}
+    GROUP BY 
+        tm.team_id, tm.user_id, u.username, t.name
+    ORDER by
+        username
+    `;
+    let params = [contest_id];
+    if(username!='') params.push(username);
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+
 export default {
     get_contest_list,
     get_contest_details,
@@ -147,6 +180,7 @@ export default {
     get_contest_type,
     get_contest_access,
     get_contest_layout_data,
-    get_private_contest_access
+    get_private_contest_access,
+    get_participant_list
 }
 
