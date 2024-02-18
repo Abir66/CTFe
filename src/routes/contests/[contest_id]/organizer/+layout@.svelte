@@ -107,7 +107,7 @@
 
 
 <div class="flex flex-row w-full">
-    <div class="hidden sm:flex flex-col justify-between py-5 text-sm sm:text-base lg:text-xl mb-10 w-1/4 border-r">
+    <div class="hidden sm:flex flex-col py-5 text-sm sm:text-base lg:text-xl mb-10 w-1/4 border-r">
         {#each sections as section}
             <a class="w-full section hover:bg-primary hover:text-secondary" href={section.link}>{section.name}</a>
         {/each}
