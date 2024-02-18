@@ -3,6 +3,7 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { redirect, error } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
+import Contest from  '$lib/server/database/contest'
 
 async function supabase({ event, resolve }) {
   event.locals.supabase = createSupabaseServerClient({
@@ -48,11 +49,25 @@ async function authorization({ event, resolve }) {
   event.locals.user = user
 
   if (event.url.pathname.startsWith('/auth') && session!=null) {
-   
     const pathname = event.url.pathname
     if(pathname == '/auth/login' || pathname == '/auth/register')
       throw redirect(303, '/')
   }
+
+  if(event.url.pathname.includes('/organizer')){
+    console.log(event.params)
+    // if user is not logged in, redirect to login page
+    if(!event.locals.user) throw redirect(303, '/auth/login')
+    const access_response = await Contest.get_contest_access(event.params.contest_id, event.locals.user.id)
+    if(!access_response.success){
+      throw error(500, "Internal Server Error")
+    }
+    const access = access_response.data[0].access
+    console.log('access', access)
+    if(access.access != 'organizer') throw error(403, "Forbidden")
+    
+  }
+
 
   return resolve(event)
 }

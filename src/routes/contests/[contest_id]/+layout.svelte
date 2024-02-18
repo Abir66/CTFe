@@ -2,13 +2,6 @@
     import {onMount} from 'svelte';
     import {page} from "$app/stores";
     import { Separator } from "$lib/components/ui/separator";
-    import { Button, buttonVariants } from "$lib/components/ui/button";
-    import * as Dialog from "$lib/components/ui/dialog";
-    import { Skeleton } from "$lib/components/ui/skeleton";
-    import { goto } from '$app/navigation';
-
-    import { Input } from "$lib/components/ui/input";
-    import { Label } from "$lib/components/ui/label";
     import * as Drawer from "$lib/components/ui/drawer";
     import TeamSummary from "./team_summary.svelte";
     export let data;
@@ -131,8 +124,6 @@
     {/if}
 
 </div>
-
-
 
 <slot />
 

@@ -76,7 +76,6 @@ async function get_problems_for_viewer(contest_id, contest_status='finished'){
 
     const params = [contest_id];
     let result = await Database.run_query(query, params);
-    console.log(result);
     return result;
 }
 
