@@ -42,24 +42,35 @@ async function check_submitted_flag(user_id,contest_id,challenge_id,team_id,flag
     return result;
 }
 
+async function get_submissions_for_organizer(contest_id, team='', username='', problem='', category='') {
 
+    let query = `
+        select 
+            s.id, s.user_id, s.team_id, s.verdict, s.flag, s.variation_id, s.time,
+            u.username,
+            t.name as team_name,
+            cp.title, cp.category,
+            pv.variation_name
+
+        from contest_submissions s
+        inner join users u on s.user_id = u.id
+        inner join teams t on t.id = s.team_id
+        inner join contest_problems cp on cp.id = s.problem_id
+        inner join problem_variations pv on pv.id =  s.variation_id
+        where s.contest_id = $1
+        and t.name ilike '%' || $2 || '%'
+        and u.username ilike '%' || $3 || '%'
+        and cp.title ilike '%' || $4 || '%'
+        and cp.category ilike '%' || $5 || '%'
+        order by s.id desc
+    `
+
+    let params = [contest_id, team, username, problem, category]
+    let result = await Database.run_query(query, params)
+    return result
+}
 
 export default {
     check_submitted_flag,
+    get_submissions_for_organizer
 }
-
-// SELECT 1 
-//     FROM team_attempts 
-//     WHERE team_id = NEW.team_id
-//     AND problem_id = NEW.problem_id
-//     AND contest_id = NEW.contest_id;
-//     IF NOT FOUND THEN
-    //   INSERT INTO team_attempts(team_id,contest_id,problem_id)
-    //   VALUES(NEW.team_id,NEW.contest_id,NEW.problem_id);
-//     ELSE
-//       UPDATE team_attempts SET
-//       attempt_count = attempt_count+1
-//       WHERE team_id = NEW.team_id
-//       AND problem_id = NEW.problem_id
-//       AND contest_id = NEW.contest_id;
-//     END IF;
