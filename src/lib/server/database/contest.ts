@@ -52,7 +52,7 @@ async function get_contest_list(search_str, type, status) {
 
 async function get_contest_details(contest_id) {
     const query = `
-        SELECT id, description, start_time, end_time, type, memberlimit, contest_name, format, registration_paused
+        SELECT id, description, start_time, end_time, type, memberlimit, contest_name, format, registration_paused,created_by, contest_password
         FROM contests
         WHERE id = $1;
     `;
