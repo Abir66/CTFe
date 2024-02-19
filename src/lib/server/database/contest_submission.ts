@@ -43,7 +43,6 @@ async function check_submitted_flag(user_id,contest_id,challenge_id,team_id,flag
 }
 
 async function get_submissions_for_organizer(contest_id, team='', username='', problem='', category='') {
-
     let query = `
         select 
             s.id, s.user_id, s.team_id, s.verdict, s.flag, s.variation_id, s.time,
@@ -70,7 +69,38 @@ async function get_submissions_for_organizer(contest_id, team='', username='', p
     return result
 }
 
+
+async function get_solves_for_organizer(contest_id, team='', username='', problem='', category='') {
+    let query = `
+        select 
+            s.id, s.user_id, s.team_id, csub.flag, csub.variation_id, s.created_at as time,
+            u.username,
+            t.name as team_name,
+            cp.title, cp.category,
+            pv.variation_name
+
+        from contest_solves s
+        inner join users u on s.user_id = u.id
+        inner join teams t on t.id = s.team_id
+        inner join contest_problems cp on cp.id = s.problem_id
+        inner join contest_submissions csub on csub.id = s.submission_id
+        inner join problem_variations pv on pv.id =  csub.variation_id
+        where s.contest_id = $1
+        and t.name ilike '%' || $2 || '%'
+        and u.username ilike '%' || $3 || '%'
+        and cp.title ilike '%' || $4 || '%'
+        and cp.category ilike '%' || $5 || '%'
+        order by s.id desc
+    `
+
+    let params = [contest_id, team, username, problem, category]
+    let result = await Database.run_query(query, params)
+    return result
+}
+
+
 export default {
     check_submitted_flag,
-    get_submissions_for_organizer
+    get_submissions_for_organizer,
+    get_solves_for_organizer
 }

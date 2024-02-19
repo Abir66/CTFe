@@ -59,6 +59,7 @@
         {name: "Teams", link: "/contests/"+contest_id+"/organizer/teams"},
         {name: "Scoreboard", link: "/contests/"+contest_id+"/organizer/scoreboard"},
         {name: "Submissions", link: "/contests/"+contest_id+"/organizer/submissions"},
+        {name: "Solves", link: "/contests/"+contest_id+"/organizer/solves"},
         {name: "Challenges", link: "/contests/"+contest_id+"/organizer/challenges"},
         {name: "Flag Mismatch", link: "/contests/"+contest_id+"/organizer/flag_mismatch"},
     ];
@@ -84,9 +85,9 @@
               </DropdownMenu.Root>
         </div>
         
-        <h1 class="scroll-m-20  text-3xl font-extrabold">
-            {contest_name} 
-        </h1>
+        <a class="scroll-m-20  text-3xl font-extrabold" href="/contests/{contest_id}">
+            {contest_name}
+        </a>
     </div>
     
     
@@ -107,7 +108,7 @@
 
 
 <div class="flex flex-row w-full">
-    <div class="hidden sm:flex flex-col py-5 text-sm sm:text-base lg:text-xl mb-10 w-1/4 border-r">
+    <div class="hidden sm:flex flex-col py-5 text-sm sm:text-base lg:text-md mb-10 w-1/4 border-r">
         {#each sections as section}
             <a class="w-full section hover:bg-primary hover:text-secondary" href={section.link}>{section.name}</a>
         {/each}
