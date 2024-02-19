@@ -73,9 +73,6 @@
                 <Button class="w-1/4" type="submit">Submit</Button>
             </form>
             
-			
-		
-        
         </Dialog.Content>
 	</Dialog.Root>
 {/if}
@@ -113,14 +110,15 @@
     <div class="w-full lg:w-1/4 ">
         <div>
             {#if !(data.access.access == 'restricted' && (data.access.contest_status == 'ongoing' || data.access.contest_status == 'upcoming'))}
-            <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5" on:click={gotoContest}>Go to Contest</Button>
+                <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5" on:click={gotoContest}>Go to Contest</Button>
             {/if}
-            {#if data.registration_eligibility}
+            {#if data.access.access == 'organizer'}
+                <Button  class="w-full py-6 text-lg border-primary" on:click={() => goto(`/contests/${contest_details.id}/organizer`)}>Admin Panel</Button>
+            {:else if data.registration_eligibility}
                 <Button class="w-full py-6 text-lg" on:click={() => goto(`/contests/${contest_details.id}/register`)}>Register</Button>
             {:else if data.already_registered}
                 <Button variant="outline" class="w-full py-6 text-lg bg-green-500 hover:bg-green-500">Registered</Button>
             {/if}
-
         </div>
 
         <Card.Root class="my-10 px-5 py-3">

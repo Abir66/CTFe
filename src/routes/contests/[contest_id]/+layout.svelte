@@ -88,9 +88,9 @@
 
 
 <div class="flex flex-col sm:flex-row justify-between">
-    <h1 class="scroll-m-20 mt-5 py-2 text-3xl font-extrabold">
+    <a class="scroll-m-20 mt-5 py-2 text-3xl font-extrabold" href="/contests/{contest_id}">
         {contest_name}
-    </h1>
+    </a>
     {#if contest_state==="Running"}
         <div class="scroll-m-20 mt-5 py-2 sm:text-3xl font-bold float-right">
             <p>{hours}:{minutes}:{seconds}</p>
@@ -120,7 +120,7 @@
     {#if data.contest.access == 'participant'}
         <button on:click={showSummary}>My Team</button>
     {:else if data.contest.access == 'organizer'}
-        <a href="/contests/{contest_id}/admin">Admin Panel</a>
+        <a href="/contests/{contest_id}/organizer">Admin Panel</a>
     {/if}
 
 </div>
