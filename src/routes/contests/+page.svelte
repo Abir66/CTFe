@@ -35,10 +35,10 @@ const go_to_create_contest = () => {
 };
 </script>
 
-<div class="flex justify-start items-center">
+<div class="flex justify-between w-full items-center">
 	<h1 class="py-5 text-4xl font-bold mr-8">Contests</h1> 
 	{#if $page.data.user}
-	<Button class="rounded-full hover:scale-105 hover:shadow-slate-400 hover:shadow-md " on:click={go_to_create_contest}>+</Button>
+	<Button  class="hover:scale-105" on:click={go_to_create_contest}>+ Create Contest</Button>
 	{/if}
 </div>
 

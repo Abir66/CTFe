@@ -8,7 +8,7 @@
 </script>
 
 
-<h1 class="py-12 text-xl font-bold mr-8 text-center"> Create Contest</h1> 
+<h1 class="py-12 text-xl font-bold text-center"> Create Contest</h1> 
 
 <form  method="post" >
      

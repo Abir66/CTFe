@@ -64,7 +64,7 @@ async function authorization({ event, resolve }) {
     }
     const access = access_response.data[0].access
     console.log('access', access)
-    if(access.access != 'organizer') throw error(403, "Forbidden")
+    // if(access.access != 'organizer') throw error(403, "Forbidden")
     
   }
 
