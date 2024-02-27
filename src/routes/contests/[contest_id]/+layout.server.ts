@@ -16,8 +16,6 @@ export const load = async ({params,locals}) => {
         return error(404, "contest not found");
     }
 
-    console.log(response.data[0].layout_data);
-
     return {
         contest : response.data[0].layout_data,
         contest_id : contest_id
