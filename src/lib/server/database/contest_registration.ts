@@ -22,14 +22,17 @@ async function join_team_via_password(user_id, contest_id, team_name, password) 
     return result;
 }
 
+async function join_team_via_invite(user_id, team_id){
+    const query = `SELECT join_team_via_invite($1, $2) as RESULT`;
+    const params = [user_id, team_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
 
 export default {
     does_user_have_team,
     create_team,
-    join_team_via_password
-    // get_contest_details,
-    // get_contest_organizers,
-    // get_contest_teams_shortlist,
-    // get_registration_eligibility
-
+    join_team_via_password,
+    join_team_via_invite
 }

@@ -113,6 +113,18 @@ async function get_contest_type(contest_id) {
     return result;
 }
 
+async function get_contest_status(contest_id) {
+    const query = `
+        SELECT get_contest_status2($1) as status;
+    `;
+
+    const params = [contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+
+}
+
+
 async function get_contest_access(contest_id, user_id) {
     const query = `SELECT get_contest_access($1, $2) as access;`;
     const params = [contest_id, user_id];
@@ -217,6 +229,7 @@ export default {
     get_private_contest_access,
     get_participant_list,
     get_team_list,
-    update_contest_description
+    update_contest_description,
+    get_contest_status
 }
 

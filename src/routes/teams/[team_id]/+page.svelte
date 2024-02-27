@@ -1,18 +1,19 @@
 <script lang="ts">
-    import SvelteMarkdown from "svelte-markdown";
-    export let data;
-    import { Button } from "$lib/components/ui/button";
-    import { Separator } from "$lib/components/ui/separator";
     import * as Card from "$lib/components/ui/card"; 
     import { goto } from "$app/navigation";
     import * as Table from "$lib/components/ui/table";
     import * as d3 from "d3";
+    import { Gear } from 'radix-icons-svelte'
+    import { Button } from '$lib/components/ui/button';
 
+
+    export let data;
+    const contest_id = data.contest_id;
+    const team_id = data.team_id;
     
     const category_solves_keys = Object.keys(data.category_solves);
     const members_id = Object.keys(data.team_members);
-    console.log(data);
-
+   
     
 
     let width = 850;
@@ -39,14 +40,16 @@
     const arc_verdict = d3.arc().innerRadius(radius * 0.5).outerRadius(radius * 0.8);
     const outerArc_verdict = d3.arc().innerRadius(radius * 0.9).outerRadius(radius * 0.9);
 
-    
-
-  
 </script>
 
 <div class=" gap-y-10 lg:flex-row justify-between py-10">
 
-    <h1 class="text-3xl font-bold mb-5">{data.team_info.name.toUpperCase()}</h1>
+    <div class="flex mb-5">
+        <h1 class="text-3xl font-bold mb-5">{data.team_info.name.toUpperCase()}</h1>
+        {#if data.is_leader}
+            <Button variant="ghost" on:click={()=>{goto(`/contests/${contest_id}/my_team`)}}><Gear class="scale-150"/></Button>
+        {/if}    
+    </div>
     <Table.Root class="lg:text-lg">
         <Table.Header>
             <Table.Row>
