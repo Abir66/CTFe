@@ -93,7 +93,9 @@
 
     
     <div class="prose prose-lg dark:prose-invert py-10">
-        <SvelteMarkdown source={contest_details.description}/>
+        {#if contest_details.description}
+            <SvelteMarkdown source={contest_details.description}/>
+        {/if}
     </div>
 
     <div class="prose prose-lg dark:prose-invert py-10">
