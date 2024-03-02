@@ -195,7 +195,37 @@ async function get_team_invites(user_id){
     const params = [user_id];
     let result = await Database.run_query(query, params);
     return result;
-}   
+}  
+
+async function search_user_by_name(username,contest_id,team_id){
+    const query = `
+    select username,id
+    from users
+    where id not in (
+    select user_id from team_members
+    where contest_id = $1
+    union
+    select user_id from organizers
+    where contest_id = $1
+    union
+    select invitee_id from team_invites
+    where team_id = $3
+    )
+    and username like '%' || $2 || '%'
+    `
+    const params = [contest_id,username,team_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+async function invite_member(user_id,invitee_id,contest_id){
+    const query = `
+        SELECT invite_user_to_team($1,$2,$3) as success;
+    `
+    const params = [user_id,contest_id,invitee_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
 
 
 export default {
@@ -214,5 +244,7 @@ export default {
     remove_member,
     get_invited_members,
     remove_invite,
-    get_team_invites
+    get_team_invites,
+    search_user_by_name,
+    invite_member
 }

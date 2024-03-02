@@ -43,6 +43,7 @@ export const load: PageServerLoad = async ({params,locals}) => {
 
 
     return {
+        contest_id: contest_id,
         team_id: team_id,
         team_members: team_members_response.data,
         team_info: team_info_response.data[0],
