@@ -61,7 +61,7 @@
 			</Table.Header>
 			<Table.Body>
 				{#each data.teams as team (team.team_id)}
-                    <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-500 bg-opacity-50 dark:bg-opacity-15' : ''}">
+                    <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-200 text-red-700 dark:bg-red-800 dark:text-red-100' : ''}">
                         <Table.Cell class="py-4 font-medium">{team.rank}</Table.Cell>
 						<Table.Cell class="py-4 font-medium">{team.name}</Table.Cell>
                         <Table.Cell>{team.solve_count}</Table.Cell>
