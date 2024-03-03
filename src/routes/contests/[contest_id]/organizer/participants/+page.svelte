@@ -20,7 +20,7 @@
 
 <div class="mb-10 rounded-md border px-10 py-5">
 	{#if data.participants.length == 0}
-		<div class="py-10 text-center text-2xl font-bold">No contests found</div>
+		<div class="py-10 text-center text-2xl font-bold">No participants found</div>
 	{:else}
 		<Table.Root class="lg:text-md">
 			<Table.Header>

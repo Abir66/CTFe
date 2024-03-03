@@ -68,7 +68,7 @@ async function get_member_limit(contest_id){
 
 async function get_leader_id(team_id){
     const query = `
-        select leader_id from teams
+        select leader_id, contest_id from teams
         where id = $1
     `
     const params = [team_id];
@@ -195,7 +195,30 @@ async function get_team_invites(user_id){
     const params = [user_id];
     let result = await Database.run_query(query, params);
     return result;
-}   
+}
+
+async function set_team_status(team_id, status){
+    const query = `
+        update teams
+        set status = $2
+        where id = $1
+    `
+    const params = [team_id, status];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+async function get_user_team_info(user_id, contest_id){
+    const query = `
+        select tm.team_id, tm.contest_id, t.name as team_name
+        from team_members tm
+        left join teams t on tm.team_id = t.id and tm.contest_id = t.contest_id
+        where tm.user_id = $1 and tm.contest_id = $2
+    `
+    const params = [user_id, contest_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
 
 
 export default {
@@ -214,5 +237,7 @@ export default {
     remove_member,
     get_invited_members,
     remove_invite,
-    get_team_invites
+    get_team_invites,
+    set_team_status,
+    get_user_team_info
 }

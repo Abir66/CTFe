@@ -42,6 +42,10 @@
 
 </script>
 
+{#if data.team_info.status == 'banned'}
+    <div class="p-5  bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100 rounded-md">This team was banned from the contest</div>
+{/if}
+
 <div class=" gap-y-10 lg:flex-row justify-between py-10">
 
     <div class="flex mb-5">
