@@ -1,91 +1,259 @@
-<script lang="ts">
-	import SvelteMarkdown from 'svelte-markdown';
+<script lang='ts'>
+    import { onMount } from 'svelte';
+    import SvelteMarkdown from 'svelte-markdown';
 	import { Button } from '$lib/components/ui/button';
-    import DropdownHint from '../../../Mycomponents/DropdownHint.svelte';
-	export let data;
-    const challenge = data.challenge;
-    let solved_percentage = 0;
-    let wrong_percentage = 0;
-    if(data.challenge.verdicts.correct + data.challenge.verdicts.wrong > 0){
-        solved_percentage = (data.challenge.verdicts.correct / (data.challenge.verdicts.correct  + data.challenge.verdicts.wrong) ) * 100;
-        wrong_percentage = 100 - solved_percentage;
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+    import * as Select from "$lib/components/ui/select";
+    import { toast } from "svelte-sonner";
+
+	import { Separator } from "$lib/components/ui/separator";
+    import { Skeleton } from "$lib/components/ui/skeleton";
+	import { invalidateAll } from '$app/navigation';
+    import * as Accordion from "$lib/components/ui/accordion";
+    import * as Table from '$lib/components/ui/table';
+	import { goto } from '$app/navigation';
+	import * as Popover from "$lib/components/ui/popover";
+	import * as Dialog from "$lib/components/ui/dialog";
+    import { Switch } from "$lib/components/ui/switch";
+    import { Progress } from "$lib/components/ui/progress";
+    
+   
+    export let data;
+
+    $: user_submissions = data.user_submissions;
+    $: challenge = data.problem;
+    let submit_error = '';
+    let flag = '';
+    let verdict = '';
+    
+
+    function formatTime(inputTimeString) {
+        // Parse the input time string into a datetime object
+        const utcTime = new Date(inputTimeString);
+
+        // Create a new Date object with Bangladesh time zone (GMT+6)
+        const bdTime = new Date(utcTime.getTime() + (6 * 60 * 60 * 1000));
+
+        // Format the date according to the desired format
+        return bdTime.toLocaleDateString("en-BD", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        }) + " " + bdTime.toLocaleTimeString("en-BD", {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+        });
     }
+
+
+
+    async function submitFlag(event){
+
+        if(!flag){
+            submit_error = 'Flag can not be empty'
+            return
+        }
+
+        toast("Submitting Flag...")
+        submit_error = ''
+        const formEl = event.target as HTMLFormElement
+        const response = await fetch(`/api/public_problem/submit_flag`, {
+            method: 'POST',
+            body: JSON.stringify({
+                problem_id: challenge.id,
+                variation_id: selected_variation_id.value,
+                flag: flag
+            })
+        })
+
+        const responseData = await response.json()
+
+        if(responseData.success) {
+            const data = responseData.data
+            if(data.submitted){
+                toast('Flag Submitted')
+                verdict = data.verdict
+
+                const new_submission = {
+                    id : data.id,
+                    flag: flag,
+                    time: formatTime(data.time),
+                    problem_id: data.problem_id,
+                    verdict: data.verdict,
+                    variation_id: selected_variation_id.value,
+                    variation_name: selected_variation_id.label
+                }
+
+                user_submissions = [new_submission, ...user_submissions]
+            }
+            else{
+                if(data.message) submit_error = data.message        
+                else toast("Something went wrong. Please try again.")
+            }
+        }
+        else {
+            if(responseData.message) submit_error = responseData.message        
+            else toast("Something went wrong. Please try again.")
+        }
+    
+        formEl.reset()
+    }
+
+    let selected_variation_id = {
+        value : data.problem.variation_id,
+        label : data.problem.variation_name
+    } 
+   
+    async function change_variation(selected){
+        selected_variation_id = selected
+        toast("Loading...")
+        goto(`/problems/${challenge.id}/?variation_id=${selected_variation_id.value}`)
+    }
+
+
 </script>
-<div id="problem_details_navbar" class="flex">
-    <a href="#" class="font-semibold text-xl mr-5 hover:cursor-pointer"><u class="underline-offset-8">Description</u></a>
-    <a href="#" class="font-medium text-xl hover:cursor-pointer">Discussion</a>
-</div>
-<div class="flex flex-col gap-y-10 lg:flex-row justify-between py-10">
-    <div id="problem_details_card" class=" float-left border-2 rounded-lg lg:w-1/2 border-black dark:border-gray-700">
-        <div class="flex min-w-0 flex-col p-5">
-            <div class="">
-                <h1 class="text-2xl font-bold">{data.challenge.name}</h1>
+
+<div class="flex flex-col w-full lg:flex-row justify-between">
+    <div class="flex min-w-0 w-full lg:w-1/2 flex-col p-5">
+
+            <div class="flex w-full space-x-5">
+                <h1 class="text-3xl font-bold">{challenge.title}</h1>
+
+                <Select.Root bind:selected={selected_variation_id} onSelectedChange={(selected) =>{change_variation(selected)}}>
+                    <Select.Trigger class="w-[180px]">
+                      <Select.Value placeholder="Variations" />
+                    </Select.Trigger>
+                    <Select.Content>
+                    {#each data.variations as variation (variation.id)}
+                        <Select.Item value={variation.id}>{variation.variation_name}</Select.Item>
+                    {/each}
+                    </Select.Content>
+                </Select.Root>
             </div>
-            <hr class="w-48 h-1 bg-black border-0 rounded dark:bg-gray-700">
+            
+
             <div class="flex flex-col space-y-5">
                 <div class="prose prose-lg dark:prose-invert py-5">
-                    <SvelteMarkdown source={challenge.description} />
+                    <SvelteMarkdown source={challenge.description ? challenge.description : ''} />
                 </div>
-        
+
                 {#if challenge.attachments && challenge.attachments.length > 0}
                 <div>
-                    <h2 class="mb-3 text-xl">Attachments</h2>
+                    <h2 class="mb-3">Attachments</h2>
                     <div class="flex flex-wrap gap-3">
                         {#each challenge.attachments as attachment (attachment)}
                             <Button variant="outline" class="border-primary overflow-hidden truncate overflow-ellipsis whitespace-nowrap">
-                                <a href="{attachment.url}">{attachment.name}</a>
+                                <a target="_blank" href="{attachment.link}">{attachment.file_name}</a>
                             </Button>
                         {/each}
                     </div>
                 </div>
                 {/if}
-        
-                <h2 class="mb-3 text-xl">Author : <a class="font-bold text-blue-700" href="/user/{challenge.author.id}">{challenge.author.username}</a></h2>
+
+                
+                {#if verdict == 'correct'}
+                    <p class="p-3 text-center rounded mt-2 text-md bg-green-500 dark:bg-green-600"><span class=" font-semibold">Correct</span></p>
+                {:else if verdict == 'incorrect'}
+                    <p class="p-3 text-center mt-2 text-md bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100 rounded-md"><span class=" font-semibold">Incorrect</span></p>
+                {:else if submit_error}
+                    <p class="text-red-500">{submit_error}</p>
+                {/if}
+
+                <form  on:submit|preventDefault={submitFlag} class="flex w-full gap-x-5"  >
+                    <div class="w-3/4">
+                        <Input class="border-primary"
+                            type="text"
+                            name="flag"
+                            placeholder="Flag"
+                            bind:value={flag}
+                        />
+                    </div>
+                    <Button class="w-1/4" type="submit">Submit</Button>
+                </form>
             </div>
-        </div>
     </div>
-    <div class="w-full lg:w-1/2">
-        <div id="problem_detail_tags" class="lg:px-20 block ">
-            <div class="border-2 p-2 rounded-t-lg border-black dark:border-gray-700">Tags</div>
-            <div class="space-y-5 p-2 rounded-b-lg border-x-2 border-b-2 border-black dark:border-gray-700">
-                <div class="flex flex-wrap gap-3">
-                    {#each challenge.tags as tags (tags)}
-                        <div class="border text-center px-5 rounded border-black dark:border-gray-700 overflow-hidden truncate overflow-ellipsis whitespace-nowrap">
-                            {tags}
-                        </div>
-                    {/each}
-                </div>
-            </div>
-        </div>
-        <div id="problem_detail_hints" class="lg:px-20 block mt-5">
-            <div class="border-2 rounded-t-lg p-2 border-black dark:border-gray-700">Hints</div>
-            <div class="space-y-5 rounded-b-lg p-2 border-x-2 border-b-2 border-black dark:border-gray-700">
-                <div class="">
-                    {#each challenge.hints as hint,index (hint)}
-                        <DropdownHint  hint={hint} index={index+1} />
-                    {/each}
-                </div>
-            </div>
-        </div>
-        <div class="w-full lg:px-20 block mt-5 flex mt-5 h-2.5 inline mb-4 ">
-            <div class="bg-green-600 h-2.5 dark:bg-green-500" style="width: {solved_percentage}%"></div>
-            <div class="bg-red-600 h-2.5 dark:bg-red-500" style="width: {wrong_percentage}%"></div>
-            
-        </div>
-        <div class="flex items-center lg:px-20 block mt-5">
-            <span class="flex w-3 h-3 me-3 bg-green-600 dark:bg-green-500"></span><span class="ml-2 mr-5">Solved</span>
-            <span class="flex w-3 h-3 me-3 bg-red-600 dark:bg-red-500"></span><span class="mx-2">Wrong</span>
-        </div>
-        <div id="problem_detail_hints" class="lg:px-20 block mt-5">
-            <div class="border-2 rounded-t-lg p-2 border-black dark:border-gray-700">Writeups</div>
-            <div class="space-y-5 rounded-b-lg p-2 border-x-2 border-b-2 border-black dark:border-gray-700">
-                <div class="">
-                    {#each challenge.writeups as writeup,index (writeup)}
-                        <a href="#" class="block font-medium text-blue-600 dark:text-blue-500 hover:underline"> {writeup.title} </a>
-                    {/each}
-                </div>
-            </div>
-        </div>
-    </div>
+
+
+
+    <div class="flex min-w-0 w-full lg:w-1/3  flex-col p-5 gap-y-10">
+        <h2 class="mb-3">Author : <a class=" text-blue-700" href="/user/{challenge.author_id}">{challenge.author_name}</a></h2>      
     
+        <div class="w-full">
+            <h2 class="text-xl font-bold border-b-4">Hints</h2>      
+        
+            <Accordion.Root class="w-full">
+                {#each data.hints as hint, index (hint.id)}
+                    <Accordion.Item value={"hint" + index}>
+                    <Accordion.Trigger>Hint {index + 1}</Accordion.Trigger>
+                    <Accordion.Content>{hint.description}</Accordion.Content>
+                    </Accordion.Item>
+                {/each}
+            </Accordion.Root>
+        </div>
+
+
+        {#if user_submissions && user_submissions.length > 0}
+            <div class="w-full">
+                <h2 class="text-xl font-bold border-b-4">My Submissions</h2>
+                
+                <div class="flex my-5 space-x-4">
+                    <!-- correct submissions -->
+                    <p class="text-left">{user_submissions.filter(submission => submission.verdict === 'correct').length} Correct</p>
+                    <Progress value={user_submissions.filter(submission => submission.verdict === 'correct').length} max={user_submissions.length} class="w-[60%] m-auto" />
+                    <p class="text-right">{user_submissions.filter(submission => submission.verdict === 'incorrect').length} Incorrect</p>
+                </div>
+                
+                
+                <Table.Root class="lg:text-md">
+                    <Table.Body>
+                        {#each user_submissions as submission (submission)}
+                            <Table.Row class="py-4">
+
+                                <Table.Cell class="py-4 font-medium">{submission.time}</Table.Cell>
+                                <Table.Cell class="">{submission.verdict}</Table.Cell>
+
+                                <Popover.Root>
+                                    <Popover.Trigger class="py-4">
+                                      ...
+                                    </Popover.Trigger>
+                                    <Popover.Content class="w-60">
+                                        <div class="flex flex-col gap-y-5">
+                                            <div>
+                                                <div class="text-sm font-bold">Submitted Flag</div>
+                                                <div>{submission.flag}</div>
+                                            </div>
+        
+                                            <div>
+                                                <div class="text-sm font-bold">Verdict</div>
+                                                <div>{submission.verdict}</div>
+                                            </div>
+        
+                                            <div>
+                                                <div class="text-sm font-bold">Variation</div>
+                                                <div>{submission.variation_name}</div>
+                                            </div>
+        
+                                        </div>
+                                    </Popover.Content>
+                                  </Popover.Root>
+
+
+                            </Table.Row>
+                        {/each}
+                    </Table.Body>
+                </Table.Root>
+            </div>
+
+        {/if}
+
+
+        
+
+
+    </div>
 </div>
+        
+
+

@@ -35,6 +35,28 @@ const get_time = (duration) => {
 const go_to_create_contest = () => {
 	goto('/contests/create_contest');
 };
+
+function formatTime(inputTimeString) {
+	// Parse the input time string into a datetime object
+	const utcTime = new Date(inputTimeString);
+
+	// Create a new Date object with Bangladesh time zone (GMT+6)
+	const bdTime = utcTime;
+
+	// Format the date according to the desired format
+	return bdTime.toLocaleDateString("en-BD", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	}) + " " + bdTime.toLocaleTimeString("en-BD", {
+		hour: "numeric",
+		minute: "numeric",
+		second: "numeric",
+	});
+}
+
+
+
 </script>
 
 <div class="flex justify-between w-full items-center">
@@ -118,7 +140,7 @@ const go_to_create_contest = () => {
 								<StarFilled class="inline text-yellow-500" />
 							{/if}
 						</Table.Cell>
-						<Table.Cell>{new Date(contest.start_time).toDateString()}</Table.Cell>
+						<Table.Cell>{formatTime(contest.start_time)}</Table.Cell>
 						<Table.Cell>{get_time(contest.duration)}</Table.Cell>
 						<Table.Cell class="text-right">
 							{#if contest.status == 'upcoming'}
