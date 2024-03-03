@@ -166,10 +166,8 @@
         const responseData = await response.json()
         invite_error = responseData.response.data[0].success;
         if(invite_error == "success"){
-            temp_invite.push({invitee_id:user_id,username:username});
-            for(let i=0;i<temp_invite.length;i++){
-                console.log(temp_invite[i]);
-            }
+            invited_members.push({invitee_id:user_id,username:username});
+            invited_members = invited_members;
         }
     }
     async function handleInviteInput(event){
