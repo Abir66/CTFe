@@ -120,7 +120,7 @@
 			</Table.Header>
 			<Table.Body>
 				{#each data.teams as team (team.id)}
-                    <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-500 bg-opacity-50 dark:bg-opacity-15 hover:bg-red-500 hover:bg-opacity-50' : ''}">
+                    <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-200 text-red-700 dark:bg-red-800 dark:text-red-100' : ''}">
                         <Table.Cell class="py-4 font-medium"><a href="/teams/{team.id}" class="hover:underline">{team.name}</a></Table.Cell>
                         <Table.Cell class="">{team.member_count}</Table.Cell>
 

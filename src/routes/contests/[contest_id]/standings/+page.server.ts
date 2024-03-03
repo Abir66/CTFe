@@ -1,26 +1,22 @@
 import { error } from '@sveltejs/kit';
-import standings from '$lib/server/database/contest_standings';
-export const load =  async (serverLoadEvent) => {
-    const {fetch} = serverLoadEvent;
-    const contest_id = serverLoadEvent.params.contest_id;
-    
-	let result = await serverLoadEvent.locals.supabase.rpc('get_contest_status', {p_contest_id : contest_id})
-    
-    console.log(result.data);
-    
-    if( result.data == 'contest not found'){
-        error(404, "Contest not found");
+import ContestStandings from '$lib/server/database/contest_standings.js';
+export const load = async ({url,fetch,params,locals}) => {
+    let search_team_name = url.searchParams.get('search_team_name');
+    let show_banned = url.searchParams.get('show_banned');
+    if(search_team_name === null) search_team_name = '';
+    if(show_banned === null) show_banned = ''
+    const contest_id = params.contest_id
+    const teams = await ContestStandings.get_standings_public_view(contest_id, search_team_name, show_banned=='true');
+    if(!teams.success){
+        console.log(teams.error);
+        return error(500, 'Something went wrong');
     }
-    else
-    {
-        if(result.data == 'upcoming'){
-            error(403, "Contest not started yet");
-        }
-    }
-    let standings_data = await standings.get_team_standings(contest_id);
-    console.log(standings_data);
-	return {
-        standings: standings_data.data,
-        contest_id: contest_id
-	};
+
+    // console.log(teams.data)
+    return {
+        teams : teams.data,
+        contest_id,
+        search_team_name: search_team_name,
+        show_banned: show_banned == 'true'
+    };
 }
