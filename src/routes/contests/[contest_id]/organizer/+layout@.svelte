@@ -62,6 +62,7 @@
         {name: "Solves", link: "/contests/"+contest_id+"/organizer/solves"},
         {name: "Challenges", link: "/contests/"+contest_id+"/organizer/challenges"},
         {name: "Flag Mismatch", link: "/contests/"+contest_id+"/organizer/flag_mismatch"},
+        {name: "Banned Users", link: "/contests/"+contest_id+"/organizer/banned_users"},
     ];
 
 </script>

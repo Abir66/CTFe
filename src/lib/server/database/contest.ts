@@ -217,6 +217,35 @@ async function update_contest_description(contest_id, description){
     return result;
 }
 
+async function get_banned_users(contest_id, search_user_name){
+
+    const query = `
+        SELECT bt.user_id, u.username
+        FROM banned_users bt
+        LEFT JOIN team_members tm ON bt.user_id = tm.user_id and bt.contest_id = tm.contest_id
+        LEFT JOIN users u ON bt.user_id = u.id
+        WHERE bt.contest_id = $1 ${search_user_name!=''  ? "AND u.username ILIKE '%' || $2 || '%'" : ""}
+        AND tm.team_id IS NULL
+        ORDER BY LOWER(u.username)
+    `;
+
+    let params = [contest_id];
+    if(search_user_name!='') params.push(search_user_name);
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function remove_user_ban(user_id, contest_id){
+    const query = `
+        DELETE FROM banned_users
+        WHERE contest_id = $2 AND user_id = $1;
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+
 export default {
     get_contest_list,
     get_contest_details,
@@ -230,6 +259,8 @@ export default {
     get_participant_list,
     get_team_list,
     update_contest_description,
-    get_contest_status
+    get_contest_status,
+    get_banned_users,
+    remove_user_ban
 }
 
