@@ -1,11 +1,12 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
+     import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
     import * as Dialog from "$lib/components/ui/dialog";
     import { Separator } from "$lib/components/ui/separator";
     import { Switch } from "$lib/components/ui/switch";
     import { toast } from "svelte-sonner";
+	import { page } from '$app/stores';
     export let data;
    
     let team_members = data.team_members;
@@ -16,6 +17,10 @@
    
     
     let delete_team_dialog_open = false;
+    let team_invitation_open = false;
+    function team_invitation_dialog() {
+        team_invitation_open = true;
+    }
     function show_delete_team_dialog() {
         delete_team_dialog_open = true;
     }
@@ -144,8 +149,79 @@
         }
     }
 
-</script>
+    let invite_string  = "";
+    let timer;
+    let invite_error = "";
+    $: users = [];
+    async function send_invitation(user_id,username){
+        const response = await fetch(`/api/my_team/${team_id}/team_invite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({invitee_id:user_id,contest_id:data.contest_id,inviter_id:$page.data.user.id})
+        })
+        const responseData = await response.json()
+        invite_error = responseData.response.data[0].success;
+        if(invite_error == "success"){
+            invited_members.push({invitee_id:user_id,username:username});
+            invited_members = invited_members;
+        }
+    }
+    async function handleInviteInput(event){
+        invite_string = event.target.value;
 
+        clearTimeout(timer);
+        if(invite_string.length < 3){
+            return;
+        }
+        timer = setTimeout(() => {
+            console.log("Search string:", invite_string);
+            fetch(`/api/my_team/${team_id}/team_invite?invite_string=${invite_string}&team_id=${team_id}&contest_id=${data.contest_id}`)
+            .then(response => response.json())
+            .then(data => {
+                // Store API response in result variable or process it as needed
+                let result = data;
+                if(result.response.data.length == 0){
+                    invite_error = "No user found";
+                }
+                else{
+                    invite_error = "";
+                }
+                users = result.response.data;
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+        }, 500);
+    }
+
+</script>
+<Dialog.Root bind:open={team_invitation_open} onOpenChange={(open) => {if (!open) {team_invitation_open = false;}}}>
+    <Dialog.Content class="sm:max-w-[425px]">
+        <Dialog.Header>
+            <Dialog.Title>Add team member</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Description>
+            <form  class="flex flex-col w-full gap-y-5"  >
+                <Input bind:value={invite_string} name="invite" on:input={handleInviteInput} type="text" placeholder="Enter username" autocomplete="off"/>
+                {#if invite_error == "success"}
+                    <p class="text-green-500">{invite_error}</p>
+                {:else if invite_error}
+                    <p class="text-red-500">{invite_error}</p>
+                {/if}
+                {#each users as user,index (user)}
+                    <div class="flex justify-between">
+                        <div class="flex font-semibold text-lg gap-x-2 align-baseline">
+                            <a class="hover:underline" href="/user/{user.id}">{user.username}</a>
+                        </div>
+                        <Button class="text-sm" on:click={()=>{send_invitation(user.id,user.username)}}>Invite</Button>
+                    </div>
+                {/each}
+            </form>
+        </Dialog.Description>
+    </Dialog.Content>
+</Dialog.Root>
 
 
 <Dialog.Root bind:open={delete_team_dialog_open} onOpenChange={(open) => {if (!open) {delete_team_dialog_open = false;}}}>
@@ -214,8 +290,7 @@
         <p class="text-red-500">{team_member_error}</p>
     {/if}
     
-    <Button type="submit" class="w-full mt-5"> + Invite user</Button>
-   
+    <Button type="submit" class="w-full mt-5" on:click={team_invitation_dialog}> + Invite user</Button>   
 
 </div>
 
