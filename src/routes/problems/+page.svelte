@@ -1,100 +1,77 @@
 <script>
-    export let data = [];
-    let isOpen = false;
-    let catagories = ["cryptograpgy","OSINT","steganography","web","forensics"];
-    let buttonText = "Select Catagory";
-    let filter_catagories = [];
-    function changeButtonText(selectedItem) {
-        buttonText = selectedItem;
-        isOpen = !isOpen;
-    }
+	import * as Table from '$lib/components/ui/table';
+	import { Badge } from '$lib/components/ui/badge';
+	import { Input } from '$lib/components/ui/input';
+	import * as Select from '$lib/components/ui/select';
+	import { Button } from '$lib/components/ui/button';
+	import { LockClosed } from 'radix-icons-svelte';
+	import { StarFilled } from 'radix-icons-svelte';
+	import Categories from '$lib/categories';
 
-    function addCatagory() {
-        if(buttonText == "Dropdown") {
-            return;
-        }
-        let newCatagory = buttonText;
-        filter_catagories.push(newCatagory);
-        filter_catagories = filter_catagories;
-        const index = catagories.indexOf(newCatagory);
-        catagories.splice(index, 1);
-        catagories = catagories;
-        buttonText = "Select Catagory";
-    }
+	import { goto } from '$app/navigation';
+    import { page } from '$app/stores';
 
-    function removeCatagory(catagory){
-        const index = filter_catagories.indexOf(catagory);
-        filter_catagories.splice(index, 1);
-        filter_catagories = filter_catagories;
-        catagories.push(catagory);
-        catagories = catagories;
-    
-    }
+	export let data ;
 
 </script>
 
-<h1 class="mb-2 text-3xl font-bold leading-none tracking-tight text-gray-900  dark:text-white">Problems</h1>
-<hr class="w-48 h-1 bg-black border-0 rounded dark:bg-gray-700">
 
-<div class=" relative">
-    
-    <div class=" p-4 lg:mt-10 lg:w-1/4 lg:float-right">
-        <form class="p-6 border-2 w-full border-black dark:border-gray-700 ">
-                <label for="default-search" class="mb-2 text-xs font-medium text-gray-900 sr-only dark:text-white">Search</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                        </svg>
-                    </div>
-                    <input type="search" id="default-search" class="block w-full p-4 ps-10 text-xs text-gray-900 border border-gray-300"  placeholder="Search Problems" >
-                </div>
-                
-                <div class="relative">
-                    <div class="flex">
-                        <button id="filter_add" class="px-6 w-3/4 py-2 mt-4 mr-1 border border-black dark:border-gray-700 overflow-hidden truncate overflow-ellipsis whitespace-nowrap" on:click={() => (isOpen = !isOpen)}>
-                            {buttonText}
-                          </button>
-                          <button id="filter_dropdown" class=" w-1/4 py-2 mt-4 ml-1 border text-center border-black dark:border-gray-700 " on:click={() => addCatagory()}>
-                              Add
-                          </button>
-                    </div>
-                    {#if isOpen}
-                      <div class="absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
-                        {#each catagories as item (item)}
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white" on:click={() => changeButtonText(item)}>
-                            {item}
-                        </a>
-                        {/each}
-                      </div>
-                    {/if}
-                </div>
-                <div class="">
-                    <div class="flex" >
-                        <div class="py-1 mt-2 items-center flex-wrap">
-                            {#each filter_catagories as catagory, index (catagory)}
-                                <div class="text-center inline-block text-white bg-blue-500 px-1 m-0.5 text-gray-800 rounded-lg ">
-                                    {catagory}
-                                    <button class="w-5 h-5 float-right rounded-lg" on:click={() => removeCatagory(catagory)}>x</button>
-                                </div>
-                            {/each}
-                          </div>
-                    </div>
-                    
-                      <div class="px-2  text-center py-1 w-full lg:w-1/2 bg-sky-700 shadow-sm text-white overflow-hidden truncate overflow-ellipsis whitespace-nowrap">Apply Filter</div>
-    
-                </div>
-                
-            </form> 
-            
-    </div>
-       
-    <div class='flex w-3/4 items-center border-b-2 border-b-black py-2 dark:border-gray-700 '>
-        <p class='w-1/4 px-4 lg:text-lg'>Problem</p><p class='w-1/4 px-4 lg:text-lg'>Date</p><p class='w-1/4 px-4 lg:text-lg'>Category</p><p class='w-1/4 px-4 lg:text-lg'>Contest</p>
-    </div>
-    {#each data.challenge as item}
-        <div class='flex w-full lg:w-3/4 items-center rounded border-2 border-black my-2 dark:border-gray-700 '>
-            <p class='w-1/4 lg:text-lg p-4 '>{item.problem_name}</p><p class='w-1/4 text-base md:test-lg lg:text-lg p-4 '>{item.date}</p><p class='w-1/4 lg:text-lg p-4 '>{item.category}</p><p class='w-1/4 lg:text-lg p-4 '>{item.contest}</p>
-        </div>
-    {/each}
+<h1 class="py-5 text-4xl font-bold mr-8">Problems</h1> 
+
+<form
+  action="/problems"
+  method="GET"
+  class="w-full mb-10 flex flex-col items-center justify-between gap-y-5 py-4 text-xl md:flex-row lg:gap-x-5 lg:gap-y-0"
+>
+	<div class="w-full">
+		<Input  name="search_str" class="w-full" placeholder={data.search_str? data.search_str : 'Search problem'} type="text" />
+	</div>
+
+	<div class="flex w-full justify-between gap-x-5">
+		<Select.Root multiple={true}>
+			<Select.Trigger class="w-full">
+				<Select.Value placeholder="Type" />
+			</Select.Trigger>
+			<Select.Content>
+				{#each Categories as category}
+					<Select.Item value="{category}">{category}</Select.Item>
+				{/each}
+			</Select.Content>
+			<Select.Input name="category" />
+		</Select.Root>
+	</div>
+
+	<div class="flex justify-start w-full gap-x-5">
+		<Button type="submit" class="w-full">Search</Button>
+		{#if data.search_str || data.category }
+        	<Button variant='outline' class="w-full" on:click={()=>{goto(`/problems`)}}>Clear</Button>
+    	{/if}
+	</div>
+	
+</form>
+
+<div class="mb-10 rounded-md border px-10 py-5">
+	{#if data.problems.length == 0}
+		<div class="py-10 text-center text-2xl font-bold">No contests found</div>
+	{:else}
+		<Table.Root class="lg:text-md">
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Problem</Table.Head>
+					<Table.Head>Contest</Table.Head>
+					<Table.Head class="text-right">Category</Table.Head>
+					<!-- <Table.Head class="text-right">Status</Table.Head> -->
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each data.problems as problem (problem)}
+					<Table.Row class="hover:bg-slate-200 dark:hover:bg-slate-900" on:click={() => {goto(`/problems/${problem.id}`);}}	>
+						<Table.Cell class="py-4 font-medium">{problem.title}</Table.Cell>
+						<Table.Cell class="py-4 font-medium"><a href="/contests/{problem.contest_id}" class="hover:underline">{problem.contest_name}</a></Table.Cell>
+						<Table.Cell class="py-4 font-medium text-right">{problem.category}</Table.Cell>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	{/if}
 </div>
