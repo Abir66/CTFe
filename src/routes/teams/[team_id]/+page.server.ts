@@ -46,6 +46,11 @@ export const load = async ({params, locals}) => {
     Object.getOwnPropertySymbols(category_solves).forEach(symbol => {
     categorySolves[symbol.toString()] = category_solves[symbol];
     });
+
+
+    // console.log(usersDict)
+    const is_a_member = locals.user && team_members.find(member => member.user_id == locals.user.id);
+    const is_member = is_a_member ? true : false;
     
     return {
         team_id: team_id,
@@ -55,7 +60,8 @@ export const load = async ({params, locals}) => {
         team_members: usersDict,
         team_solves: team_solves,
         category_solves: category_solves,
-        verdict: verdict
+        verdict: verdict,
+        is_member: is_member
     };
 
 

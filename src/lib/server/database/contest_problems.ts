@@ -138,6 +138,23 @@ async function get_problem_access(problem_id, user_id){
     return result;
 }
 
+async function get_solves_for_a_problem(problem_id){
+    const query = `
+        select 
+            s.team_id, s.created_at as time,
+            t.name as team_name
+
+        from contest_solves s
+        inner join teams t on t.id = s.team_id
+        where s.problem_id = $1
+        order by s.id desc
+    `
+
+    const params = [problem_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 
 export default {
     get_hints,
@@ -145,5 +162,6 @@ export default {
     get_problems_for_organizer,
     get_problems_for_viewer,
     get_problems_for_participant,
-    get_problem_access
+    get_problem_access,
+    get_solves_for_a_problem
 }

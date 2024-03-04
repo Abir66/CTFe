@@ -14,9 +14,16 @@
 
     let dialogueOpen = false;
     let submit_error = '';
+    let is_banned = false;
+    if(data.access && data.access.access &&  data.access.access == 'restricted' && data.access.banned){
+        is_banned = true;
+    }
+
+    
 
     async function gotoContest(){
         submit_error = '';
+        if(data.access.access == 'restricted' && data.access.banned) return;
         if(data.access.access != 'restricted') goto(`/contests/${contest_details.id}/challenges`);
         else dialogueOpen = true;
     }
@@ -31,7 +38,6 @@
             body: formData
         })
         const responseData = await response.json()
-        console.log(responseData)
 
         if(responseData.success){
             dialogueOpen = false;
@@ -46,6 +52,10 @@
     }
 
 </script>
+
+{#if is_banned}
+    <div class="p-5  bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100 rounded-md">You were banned from the contest</div>
+{/if}
 
 {#if dialogueOpen}
 	<Dialog.Root open
@@ -111,7 +121,7 @@
 
     <div class="w-full lg:w-1/4 ">
         <div>
-            {#if !(data.access.access == 'restricted' && (data.access.contest_status == 'ongoing' || data.access.contest_status == 'upcoming'))}
+            {#if !is_banned && !(data.access.access == 'restricted' && (data.access.contest_status == 'ongoing' || data.access.contest_status == 'upcoming'))}
                 <Button variant="outline" class="w-full py-6 text-lg border-primary mb-5" on:click={gotoContest}>Go to Contest</Button>
             {/if}
             {#if data.access.access == 'organizer'}

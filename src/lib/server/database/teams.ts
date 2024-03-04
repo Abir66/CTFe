@@ -250,6 +250,17 @@ async function invite_member(user_id,invitee_id,contest_id){
     return result;
 }
 
+async function leave_team(user_id, team_id){
+    const query = `
+       DELETE FROM team_members
+         WHERE user_id = $1 AND team_id = $2
+    `;
+    const params = [user_id, team_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+
 
 
 export default {
@@ -272,5 +283,6 @@ export default {
     set_team_status,
     get_user_team_info,
     search_user_by_name,
-    invite_member
+    invite_member,
+    leave_team
 }
