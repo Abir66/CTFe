@@ -113,6 +113,18 @@ async function get_contest_type(contest_id) {
     return result;
 }
 
+async function get_contest_status(contest_id) {
+    const query = `
+        SELECT get_contest_status2($1) as status;
+    `;
+
+    const params = [contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+
+}
+
+
 async function get_contest_access(contest_id, user_id) {
     const query = `SELECT get_contest_access($1, $2) as access;`;
     const params = [contest_id, user_id];
@@ -205,6 +217,74 @@ async function update_contest_description(contest_id, description){
     return result;
 }
 
+async function get_banned_users(contest_id, search_user_name){
+
+    const query = `
+        SELECT bt.user_id, u.username
+        FROM banned_users bt
+        LEFT JOIN team_members tm ON bt.user_id = tm.user_id and bt.contest_id = tm.contest_id
+        LEFT JOIN users u ON bt.user_id = u.id
+        WHERE bt.contest_id = $1 ${search_user_name!=''  ? "AND u.username ILIKE '%' || $2 || '%'" : ""}
+        AND tm.team_id IS NULL
+        ORDER BY LOWER(u.username)
+    `;
+
+    let params = [contest_id];
+    if(search_user_name!='') params.push(search_user_name);
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function remove_user_ban(user_id, contest_id){
+    const query = `
+        DELETE FROM banned_users
+        WHERE contest_id = $2 AND user_id = $1;
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function is_organizer(user_id, contest_id){
+    const query = `
+        SELECT EXISTS(
+            SELECT 1
+            FROM organizers
+            WHERE user_id = $1 AND contest_id = $2
+        ) as is_organizer;
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function organizer_invite_validity(user_id, contest_id){
+    const query = `
+        SELECT EXISTS(
+            SELECT 1
+            FROM organizer_invites
+            WHERE invitee_id = $1 AND contest_id = $2
+        ) as organizer_invite_validity;
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function add_organizer(user_id, contest_id){
+    const query = `
+        INSERT INTO organizers (user_id, contest_id)
+        VALUES ($1, $2);
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+
+
+
+
 export default {
     get_contest_list,
     get_contest_details,
@@ -217,6 +297,12 @@ export default {
     get_private_contest_access,
     get_participant_list,
     get_team_list,
-    update_contest_description
+    update_contest_description,
+    get_contest_status,
+    get_banned_users,
+    remove_user_ban,
+    is_organizer,
+    organizer_invite_validity,
+    add_organizer
 }
 

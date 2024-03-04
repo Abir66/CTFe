@@ -33,7 +33,7 @@
 			        
 					<Cards count={data.contest_count} type="contests" user_id={data.id} path="contests/participation"/>
 					<Cards count={data.problem_count} type="problem solved" user_id={data.id} path="problems"/>
-					<Cards count=3 type="Blogs" user_id={data.id} path="contests/participation"/>
+					<Cards count={data.blogs_count} type="Blogs" user_id={data.id} path="blogs"/>
 					<Cards count=12 type="Created problem" user_id={data.id} path="contests/participation"/>
 					<Cards count={data.contest_organized} type="Organized contests" user_id={data.id} path="contests/organization"/>
 		

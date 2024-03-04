@@ -12,8 +12,7 @@ export async function POST({ locals,params }) {
     let user_id = locals.user ? locals.user.id : 0
     const response = await ContestProblems.unlock_hint(hint_id,user_id)
 
-    console.log("Response - ", JSON.stringify(response))
-
+   
     if(response.error){
         return json({ success: false, message: "Something went wrong" })
     }

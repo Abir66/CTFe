@@ -8,6 +8,9 @@
     const contest_name = data.contest.contest_name;
     const contest_id = data.contest_id;
 
+    
+    const team_id = data.contest.team_id ? data.contest.team_id : '-1'
+
     // calculate remaining time
     let contest_state = "";
     let message = "";
@@ -68,7 +71,7 @@
     
 </script>
 
-{#if summaryopen}
+{#if summaryopen && team_id && team_id != -1}
 <Drawer.Root open 
     onOpenChange={(open) => {
         if (!open) { summaryopen = false; }
@@ -76,10 +79,10 @@
     
     <Drawer.Content>
         <div class="w-full">
-            <TeamSummary contest_id={contest_id} />
+            <TeamSummary team_id={team_id} />
         </div>
         <Drawer.Footer class="mx-auto w-full max-w-sm mb-5">
-            <a target="_self" href="/contests/{contest_id}/my_team" class="w-full rounded-md p-2 text-center bg-primary text-secondary">Go To Details</a>
+            <a target="_self" href="/teams/{data.contest.team_id}" class="w-full rounded-md p-2 text-center bg-primary text-secondary">Go To Details</a>
         </Drawer.Footer>
     </Drawer.Content>
 </Drawer.Root>

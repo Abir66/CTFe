@@ -2,32 +2,51 @@
 	import * as Table from '$lib/components/ui/table';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	export let data ;
 	import { goto } from '$app/navigation';
-	import { Checkbox } from "$lib/components/ui/checkbox";
-	import { Label } from "$lib/components/ui/label";
+	import { Switch } from "$lib/components/ui/switch";
+
+
+	export let data ;
+	let show_banned = data.show_banned;
+	let search_team_name = data.search_team_name;
+
+	async function toggle_show_banned(){
+		show_banned = !show_banned;
+		submitSearch()
+	}
+
+	async function submitSearch(){
+		goto(`/contests/${data.contest_id}/organizer/scoreboard?search_team_name=${search_team_name}&show_banned=${show_banned}`);
+	}
+
+	async function clear(){
+		search_team_name = '';
+		submitSearch()
+	}
 	
 </script>
 
-<form action="/contests/{data.contest_id}/organizer/scoreboard" method="GET" class="mb-5 flex flex-col gap-y-5 sm:flex-row sm:gap-y-0 justify-between py-4 text-xl  gap-x-5">
+<form action="/contests/{data.contest_id}/organizer/scoreboard" method="GET" class="mb-5 w-full flex flex-col gap-y-5 lg:flex-row lg:gap-y-0 lg:justify-between py-4 text-xl" on:submit|preventDefault={submitSearch}>
 	<div class="w-full flex gap-x-5">
-		<div class="w-full lg:w-1/2">
-			<Input name="search_team_name" class="w-full" placeholder="Search team by name" type="text" />
+		<div class="w-3/4 lg:w-1/2">
+			<Input name="search_team_name" class="w-full" placeholder="Search team by name" type="text" bind:value={search_team_name} />
 		</div>
 		<Button type="submit">Search</Button>
 		{#if data.search_team_name!=''}
-			<Button variant='outline' on:click={()=>{goto(`/contests/${data.contest_id}/organizer/scoreboard`)}}>Clear</Button>
+			<Button variant='outline' on:click={clear}>Clear</Button>
 		{/if}
 	</div>
-	<div class="items-top flex space-x-2">
-		<input type="checkbox" id="show_banned" name="show_banned" value="yes">
-		<label for="show_banned" class="text-sm">Show Banned Teams</label><br>
+	<div class="w-full flex gap-x-2 lg:justify-end">
+		<label for="show_banned_toggle" class="text-sm">Show Banned Teams</label><br>
+		<Switch id="show_banned_toggle" bind:checked={show_banned} onCheckedChange={toggle_show_banned} />
 	</div>
 </form>
 
+
+
 <div class="mb-10 rounded-md border px-10 py-5">
 	{#if data.teams.length == 0}
-		<div class="py-10 text-center text-2xl font-bold">No contests found</div>
+		<div class="py-10 text-center text-2xl font-bold">No teams found</div>
 	{:else}
 		<Table.Root class="lg:text-md">
 			<Table.Header>
@@ -42,7 +61,7 @@
 			</Table.Header>
 			<Table.Body>
 				{#each data.teams as team (team.team_id)}
-                    <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-500 bg-opacity-50 dark:bg-opacity-15' : ''}">
+                    <Table.Row class="py-4 {team.status == 'banned' ? 'bg-red-200 text-red-700 dark:bg-red-800 dark:text-red-100' : ''}">
                         <Table.Cell class="py-4 font-medium">{team.rank}</Table.Cell>
 						<Table.Cell class="py-4 font-medium">{team.name}</Table.Cell>
                         <Table.Cell>{team.solve_count}</Table.Cell>

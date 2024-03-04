@@ -25,10 +25,13 @@
     let description = "";
     let contest_id = data.contest_id;
 
+    let delete_dialog_open = false;
+
     const deleteAnnouncement = async (a_id) =>{
         const response = await fetch(`/api/contests/${contest_id}/organizer/announcement/${a_id}`,{
             method: 'POST'
         });
+        delete_dialog_open = false;
         invalidateAll();
     }
 </script>
@@ -39,7 +42,7 @@
         <DialogTitle class="my-2">Add a anouncement</DialogTitle>
         <DialogDescription>
             <form method="POST" action="?/postAnnouncement" class=""  >
-                <Tabs defaultValue="edit">
+                <Tabs>
                     <TabsList class="w-full">
                     <TabsTrigger value="edit" class="w-1/2">Edit</TabsTrigger>
                     <TabsTrigger value="preview" class="w-1/2">Preview</TabsTrigger>
@@ -74,12 +77,13 @@
         <Card.Root class="mx-2 my-4">
             <Card.Header>
                 <Card.Title class="text-xl border-b-2 border-black dark:border-white py-1 flex justify-between">{announcement.title}
-                    <Dialog>
-                        <DialogTrigger><Trash class="text-red-500 hover:cursor-pointer" /></DialogTrigger>
+                    <Dialog bind:open={delete_dialog_open}>
+                        <DialogTrigger><Trash class="text-red-500 hover:cursor-pointer text-xl" /></DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Are you sure you want to delete <span class="truncate">{announcement.title}</span>?</DialogTitle>
+                            <DialogTitle>Delete Announcement</DialogTitle>
                             <DialogDescription>
+                                Are you sure you want to delete <span class="truncate">{announcement.title}</span>?
                             <form  on:submit|preventDefault={()=>deleteAnnouncement(announcement.id)} method="POST" action="/api/contests/{contest_id}/organizer/announcements" class="flex w-full gap-x-5"  >
                               <Button type="submit" class="w-full my-2 bg-red-500 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-300">Confirm Delete </Button>
                             </form>

@@ -7,6 +7,7 @@ export const load = async ({params,locals}) => {
     const user_id = locals.user ? locals.user.id : 0;
 	const response  = await contest.get_contest_layout_data(contest_id, user_id);
 
+
     if(response.error){
         console.log(response.error);
         return error(500, "something went wrong");
@@ -16,7 +17,12 @@ export const load = async ({params,locals}) => {
         return error(404, "contest not found");
     }
 
-    console.log(response.data[0].layout_data);
+    const layout_data = response.data[0].layout_data;
+
+    if(layout_data.status && layout_data.status == "contest not found"){
+        return error(404, "contest not found");
+    }
+
 
     return {
         contest : response.data[0].layout_data,

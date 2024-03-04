@@ -17,6 +17,7 @@ export const load = async ({params, locals}) => {
 		Contest.get_contest_access(contest_id, locals.user ? locals.user.id : 0)
 	]);
 
+
 	let data = {
 		contest_details: contest_details.data[0],
 		organizers: organizers.data,

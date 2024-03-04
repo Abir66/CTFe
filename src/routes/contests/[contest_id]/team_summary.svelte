@@ -6,17 +6,24 @@
     import * as Table from "$lib/components/ui/table";
     import * as Card from "$lib/components/ui/card";
 
-    export let contest_id;
+    export let team_id;
     let dataLoaded = false;
-    $:keys = []
-    let data = null;
+    let error = ''
+    let data;
+    let team_score
     
     onMount(async () => {
-        const response = await fetch(`/api/my_team/${contest_id}`);
-        data = await response.json();
-        console.log("hello in team summary page");
-        console.log(data);
-        keys = Object.keys(data.data);
+        error = ''
+        const response = await fetch(`/api/team/${team_id}/team_score`);
+        data = await response.json(); 
+        if(data.success){
+            team_score = data.data
+        }
+        else{
+            if(data.message) error = data.message;
+            else error = 'Something went wrong'
+        }
+
         dataLoaded = true;
     });
 
@@ -26,36 +33,40 @@
 
     
 {#if dataLoaded}
-    <div class="p-20 ">
-        
-        <Card.Root class="">
-            <Card.Header>
-              <Card.Title><p class="flex justify-center text-xl sm:text-3xl underline font-bold mb-5 sm:mb-10">{data.name}</p></Card.Title>
-            </Card.Header>
-            <Card.Content>
-                <Table.Root class="">
-                    <Table.Header>
-                    <Table.Row>
-                        <Table.Head class="">#</Table.Head>
-                        <Table.Head>Username</Table.Head>
-                        <Table.Head class="">Score</Table.Head>
-                    </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                    {#each keys as key,index}
-                    <Table.Row class="">
-                        
-                            <Table.Cell class="font-medium">{index+1}</Table.Cell>
-                            <Table.Cell>{data.data[key].name}</Table.Cell>
-                            <Table.Cell class="">{data.data[key].score}</Table.Cell>
-                    </Table.Row>
-                    {/each}
-                    </Table.Body>
-                </Table.Root>
-            </Card.Content>
-          </Card.Root>           	
-        
-
+    <div class="p-10">
+        <div class="flex flex-col gap-y-5 justify-center sm:flex-row sm:gap-y-0 sm:gap-x-20 w-full">
+            <div class="flex flex-col gap-y-2 items-center">
+                <Card.Root class="w-[200px] h-[150px] sm:w-[200px] sm:h-[200px] rounded-md">
+                    <Card.Content class="w-full h-full flex flex-col justify-center items-center align-middle">
+                        <div class="w-full h-full flex flex-col gap-y-2 justify-center items-center align-middle">
+                            <p class="font-bold text-4xl">{team_score.solve_count}</p>
+                            <p class="text-xl">{team_score.solve_count > 1 ? 'Solve':'Solves'}</p>
+                        </div>
+                    </Card.Content>
+                  </Card.Root>
+            </div>
+            <div class="flex flex-col gap-y-2 items-center">
+                <Card.Root class="w-[200px] h-[150px] sm:w-[200px] sm:h-[200px] rounded-md">
+                    <Card.Content class="w-full h-full flex flex-col justify-center items-center align-middle">
+                        <div class="w-full h-full flex flex-col gap-y-2 justify-center items-center align-middle">
+                            <p class="font-bold text-4xl">{team_score.hint_penalty}</p>
+                            <p class="text-xl">Hint Penalty</p>
+                        </div>
+                    </Card.Content>
+                  </Card.Root>
+            </div>
+            <div class="flex flex-col gap-y-2 items-center">
+                <Card.Root class="w-[200px] h-[150px] sm:w-[200px] sm:h-[200px] rounded-md">
+                    <Card.Content class="w-full h-full flex flex-col justify-center items-center align-middle">
+                        <div class="w-full h-full flex flex-col gap-y-2 justify-center items-center align-middle">
+                            <p class="font-bold text-4xl">{team_score.final_score}</p>
+                            <p class="text-xl">Points</p>
+                        </div>
+                    </Card.Content>
+                  </Card.Root>
+            </div>
+            
+        </div>
     </div>
 {:else}
     <div class="p-10">

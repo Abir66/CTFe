@@ -8,6 +8,7 @@
 	import { Sun, Moon } from 'radix-icons-svelte';
 	import { toggleMode } from 'mode-watcher';
 	import { HamburgerMenu } from 'radix-icons-svelte';
+	import * as Popover from "$lib/components/ui/popover";
 
 	let showMenu = false;
 
@@ -49,6 +50,8 @@
 			goto(href);
 		}
 	}
+
+	let profile_popover_open = false;
 
 </script>
 
@@ -102,19 +105,28 @@
 					</Button>
 					
 					
-					{#if user}
-					     <div on:click={() => {
-							goto(`/user/${user['id']}`);
-						}}>
+					{#if user && user!=null}
+					<Popover.Root bind:open={profile_popover_open}>
+						<Popover.Trigger>
 							<Avatar.Root class="border-primary border-2 hover:invert">
 								<!-- <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" /> -->
 								<Avatar.Fallback>{user['username'][0]}</Avatar.Fallback>
 							</Avatar.Root>
-						 </div>
-						
-						<form action="/auth/logout" method="POST" class="h-full w-full">
-							<Button variant="outline" type="submit" class="w-full hover:invert md:w-auto border-primary">Logout</Button>
-						</form>
+						</Popover.Trigger>
+						<Popover.Content class="w-[200px]">
+							<div class="flex flex-col gap-y-2">
+								<Button variant="ghost" type="submit" class="w-full justify-start" on:click={() => {goto(`/user/${user['id']}`); profile_popover_open = false;}}>Profile</Button>
+								<Button variant="ghost" type="submit" class="w-full justify-start" on:click={() => {goto(`/team_invites`); profile_popover_open = false;}}>Team Invites</Button>
+								<Button variant="ghost" type="submit" class="w-full justify-start" on:click={() => {goto(`/organizer_invites`); profile_popover_open = false;}}>Organizer Invites</Button>
+								<div>
+									<form action="/auth/logout" method="POST" class="h-full w-full">
+										<Button variant="ghost" type="submit" class="w-full justify-start">Logout</Button>
+									</form>
+								</div>
+					
+							</div>
+						</Popover.Content>
+					</Popover.Root> 
 						
 					{:else}
 						<a on:click|preventDefault={showModal} href="/auth/login"class="h-full w-full">
@@ -130,6 +142,8 @@
 		</nav>
 	</div>
 </div>
+
+
 
 <ModeWatcher />
 

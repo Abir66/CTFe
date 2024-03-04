@@ -8,6 +8,9 @@
 	import { Separator } from "$lib/components/ui/separator";
     import { Skeleton } from "$lib/components/ui/skeleton";
 	import { invalidateAll } from '$app/navigation';
+    import * as Select from "$lib/components/ui/select";
+    import { toast } from "svelte-sonner";
+    import * as Table from '$lib/components/ui/table';
 
 
     export let challenge_id;
@@ -16,21 +19,67 @@
     let challenge_loaded = false;
     let submit_error = '';
     let verdict = '';
+    let all_variations;
 
+
+    let selected_variation_id
+    let challenge_error = '';
 
     // ---------------- challenge ----------------------------
     onMount(async () => {
-        const response = await fetch(`/api/challenges/${challenge_id}`);
+        const response = await fetch(`/api/challenges/${challenge_id}`)
         const data = await response.json();
         console.log(data);
-        challenge = data;
+        challenge = data.problem;
+
+        
+        if(data.problem){
+            selected_variation_id = {
+                value : data.problem.variation_id,
+                label : data.problem.variation_name
+            } 
+        }
+        else{
+            challenge_error = data.error ? data.error : "Something went wrong"
+        }
+
+        all_variations = data.all_variations;
+
         challenge_loaded = true;
         console.log(challenge)
     });
 
+
+    async function change_variation(selected){
+        selected_variation_id = selected
+        challenge_loaded = false;
+        const response = await fetch(`/api/challenges/${challenge_id}/get_specific_variation`,  {
+            method: 'POST',
+            body: JSON.stringify({variation_id : selected_variation_id.value })
+        })
+
+        const data = await response.json();
+        console.log(data);
+        challenge = data.problem;
+       
+        selected_variation_id = {
+            value : data.problem.variation_id,
+            label : data.problem.variation_name
+        } 
+
+        all_variations = data.all_variations;
+
+        challenge_loaded = true;
+        console.log(challenge)
+    }
+
+    
+
     async function submitFlag(event){
+        verdict = ''
         const formEl = event.target as HTMLFormElement
         const data = new FormData(formEl)
+        data.append('variation_id', selected_variation_id.value)
 
         const response = await fetch(formEl.action, {
             method: 'POST',
@@ -42,7 +91,7 @@
         else submit_error = ''
         
         if(responseData.submitted){
-            challenge.attempt_count += 1;
+            if(!isNaN(challenge.attempt_count)) challenge.attempt_count += 1;
             challenge = challenge;
         }
 
@@ -53,7 +102,6 @@
     
         formEl.reset()
     }
-
 
     //  ------------------- hint ----------------------------
     let hints : any[] = [];
@@ -72,7 +120,6 @@
             locked_hints = hints_response['locked_hints'];
             hintLoaded = true;
         }
-        
 	}
 
     async function unlock_hint(hint_id){
@@ -98,12 +145,35 @@
         }
     }
 
-    async function showSolves(){
-		show = 'solves';
-	}
 
     async function showChallenge(){
 		show = 'challenge';
+	}
+
+
+
+
+    // --------------- solves ---------------------
+    let solves : any[] = [];
+    let solveLoaded = false;
+    let solve_error = '';
+
+	async function showSolves(){
+        show = 'solves';
+        if(!solveLoaded){
+            const response = await fetch(`/api/challenges/${challenge_id}/solves`);
+            const solves_response = await response.json();
+            
+            if(solves_response.success) {
+                solves = solves_response.data;
+            }
+            else {
+                solve_error = "Something went wrong"
+            }
+            solveLoaded = true;
+            console.log(solves)
+
+        }
 	}
 
 
@@ -128,15 +198,38 @@
                 </div>  
             
         {:else}
+            {#if challenge_error}
+                <div class="flex justify-center items-center h-96">
+                    <h1 class="text-3xl font-bold">{challenge_error}</h1>
+                </div>
+            {:else}
+
+            
         
             <div class="text-center">
                 <h1 class="text-2xl font-bold">{challenge.title}</h1>
                 <h2 class="text-2xl">{challenge.score}</h2>
             </div>
 
+            {#if all_variations}
+                <div class="text-center">
+                    <Select.Root bind:selected={selected_variation_id} onSelectedChange={(selected) =>{change_variation(selected)}}>
+                        <Select.Trigger class="w-[180px]">
+                            <Select.Value placeholder="Variations" />
+                        </Select.Trigger>
+                        <Select.Content>
+                        {#each all_variations as variation (variation.id)}
+                            <Select.Item value={variation.id}>{variation.variation_name}</Select.Item>
+                        {/each}
+                        </Select.Content>
+                    </Select.Root>
+                    
+                </div>
+            {/if}
+
             <div class="flex flex-col space-y-5">
                 <div class="prose prose-lg dark:prose-invert py-5">
-                    <SvelteMarkdown source={challenge.description? challenge.description : '' } />
+                    <SvelteMarkdown source={challenge.description ? challenge.description : ''} />
                 </div>
 
                 {#if challenge.attachments && challenge.attachments.length > 0}
@@ -184,6 +277,9 @@
                 </form>
 
             </div>
+
+            {/if}
+
         {/if}
     </div>
     
@@ -204,7 +300,7 @@
                 {#each hints as hint, index (hint.id)}
                     <div class="prose prose-lg dark:prose-invert">
                         <p class="font-bold text-sm">Hint {index + 1}</p>
-                        <SvelteMarkdown source={hint.description} />
+                        <SvelteMarkdown source={hint.description ? hint.description : ''} />
                     </div>
                     <Separator/>
                 {/each}
@@ -225,7 +321,49 @@
     </div>
 
 {:else if show == 'solves'}
-hehe
+<div class="flex min-w-0 flex-col items-center p-5 overflow-y-auto max-h-[70vh] no-scrollbar">
+
+    {#if !solveLoaded}
+        <div class="flex flex-col space-y-5">
+            <Skeleton class="h-20 w-[400px]" />
+            <Skeleton class="h-20 w-[400px]" />
+            <Skeleton class="h-10 w-[400px]" />
+        </div>  
+    {:else}
+        <!-- in the middle print solves.length -->
+        {#if solves.length == 0}
+            <div class="flex justify-center items-center ">
+                <h1 class="text-xl font-bold">No solves yet</h1>
+            </div>
+
+        {:else}
+            <div class="flex justify-center items-center ">
+                <h1 class="text-xl font-bold">{solves.length} Solves</h1>
+            </div>
+
+
+        <div class="w-full">
+            <Table.Root class="lg:text-md">
+                <Table.Header>
+                    <Table.Row>
+                        <Table.Head>Team name</Table.Head>
+                        
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                    {#each solves as solve (solve)}
+                        <Table.Row class="py-4 ">
+                            <Table.Cell class="py-4 font-medium"><a href="/teams/{solve.team_id}" class="hover:underline">{solve.team_name}</a></Table.Cell>
+                        </Table.Row>
+                    {/each}
+                </Table.Body>
+            </Table.Root>
+        </div>
+        {/if}
+    {/if}
+    
+</div>
+
 
 {/if}
 
