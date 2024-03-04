@@ -4,7 +4,6 @@ import { error } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import createContest from '$lib/server/database/contest_creation';
-import Users from '$lib/server/database/users'
 import type { Actions } from './$types';
 export const load = async ({ params, locals }) => {
 
@@ -18,12 +17,10 @@ export const load = async ({ params, locals }) => {
 		Contest.get_contest_organizers(contest_id)
 	]);
 
-	const invited = await Users.get_invited_organizers(contest_id);
 	let data = {
 		contest_details: contest_details.data[0],
 		organizers: organizers.data,
-		contest_id: contest_id,
-		invited_members: invited.data
+		contest_id: contest_id
 	}
 
 	return data;
