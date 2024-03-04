@@ -9,8 +9,8 @@
     import { toast } from "svelte-sonner";
     import { Switch } from "$lib/components/ui/switch";
     let selectedItem = "public";
-    export let form;
     export let data;
+    export let form;
     let startdate;
     let endtime;
     let starttime;
@@ -29,10 +29,118 @@
         delete_dialog_open = true;
     }
 
+    let invite_string  = "";
+    let timer;
+    let invite_error = "";
+    let users : any[] = [];
+    $: invited_members = data.invited_members;
+    let org_invitation_open = false;
+    function org_invitation_dialog() {
+        users = [];
+        invite_string = ''
+        org_invitation_open = true;
+        invite_error = ''
+        
+    }
+    let contest_id  = data.contest_id;
+    async function handleInviteInput(event){
+        invite_string = event.target.value;
 
+        clearTimeout(timer);
+        if(invite_string.length < 3){
+            return;
+        }
+        timer = setTimeout(() => {
+            console.log("Search string org:", invite_string);
+            console.log("Search string:", invite_string);
+            fetch(`/api/organizer_invites/send?invite_string=${invite_string}&contest_id=${data.contest_id}`)
+            .then(response => response.json())
+            .then(data => {
+                let result = data;
+                if(result.response.data.length == 0){
+                    invite_error = "No user found";
+                }
+                else{
+                    invite_error = "";
+                }
+                users = result.response.data;
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+        }, 500);
+    }
+
+    
+
+    async function send_invitation(user_id,username){
+        console.log(user_id,username);
+        const response = await fetch(`/api/organizer_invites/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({invitee_id:user_id,contest_id:data.contest_id})
+        })
+        const responseData = await response.json()
+        if(!responseData.success){
+            if(responseData.message) invite_error = responseData.message        
+            else toast("Something went wrong. Please try again.")
+        }
+        if(responseData.response.success == true){
+          invite_error = "success";
+        }
+        if(responseData.response.success){
+            invited_members.push({invitee_id:user_id,username:username});
+            invited_members = invited_members;
+            users = [];
+            invite_string = ''
+            invite_error = ''
+            toast('Invitation sent successfully');
+        }
+    }
+
+    async function remove_invited_member(user_id,index){
+      toast('Removing invited member');
+      
+      const response = await fetch(`/api/organizer_invites/remove`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({invitee_id:user_id,contest_id:contest_id})
+      });
+      const data = await response.json();
+      invited_members.splice(index,1);
+      toast(data.message)
+    }
 
 </script>
-   
+<Dialog.Root bind:open={org_invitation_open} onOpenChange={(open) => {if (!open) {org_invitation_open = false;}}}>
+  <Dialog.Content class="sm:max-w-[425px]">
+      <Dialog.Header>
+          <Dialog.Title>Add Organizer</Dialog.Title>
+      </Dialog.Header>
+      <Dialog.Description>
+          <form  class="flex flex-col w-full gap-y-5"  >
+              <Input bind:value={invite_string} name="invite" on:input={handleInviteInput} type="text" placeholder="Enter username" autocomplete="off"/>
+              {#if invite_error == "success"}
+                  <p class="text-green-500">{invite_error}</p>
+              {:else if invite_error}
+                  <p class="text-red-500">{invite_error}</p>
+              {/if}
+              {#each users as user,index (user)}
+                  <div class="flex justify-between">
+                      <div class="flex font-semibold text-lg gap-x-2 align-baseline">
+                          <a class="hover:underline" href="/user/{user.id}">{user.username}</a>
+                      </div>
+                      <Button class="text-sm" on:click={()=>{send_invitation(user.id,user.username)}}>Invite</Button>
+                  </div>
+              {/each}
+          </form>
+      </Dialog.Description>
+  </Dialog.Content>
+</Dialog.Root>
    
     <form  method="post" class="p-20" action="?/edit" use:enhance={()=>{toast('Updating Contest...')}}>  
         <div class="flex flex-col">
@@ -98,33 +206,34 @@
 
 
       <!-- <div class="py-8 text-lg font-bold p-20"> Created by: <span class="font-normal">{data.contest_details.created_by}</span> </div>  -->
-      <div class="py-4 text-lg font-bold p-20"> Collaborators </div> 
-      {#each data.organizers as organizer }
-        <div  class="py-2 text-sm font-bold p-20 ">
-          <a href="/user/{organizer.id}" >{organizer.username}</a>
-        </div>
-      {/each}
-      <form  method="post" class="px-20 py-10" action="?/addcollab">  
-        <div class="flex flex-row">
-            <div class="flex flex-col lg:basis-1/2 space-y-6 basis-full ">
+      <div class="py-4 text-lg font-bold p-20"> Collaborators </div>
+      <div class="p-20">
+          {#each data.organizers as organizer,index }
+            <div  class="flex py-2 justify-between ">
+              <div class="flex font-semibold text-lg gap-x-2 align-baseline">
+                {index+1}.&nbsp;&nbsp;
+                <a class="hover:underline" href="/users/1">{organizer.username}</a>
+              </div>
+            </div>
+          {/each}
+          {#each invited_members as member,index (member)}
+              <div class="flex py-2 justify-between">
+                  <div class="flex font-semibold text-lg gap-x-2 align-baseline">
+                      {data.organizers.length + index+1}.&nbsp;&nbsp;
+                      <a class="hover:underline" href="/users/1">{member.username}</a>
+                      <div class="text-sm text-gray-500 dark:text-gray-500">(pending)</div> 
+                  </div>
+                
+                  <Button class="text-sm" variant="outline" on:click={()=>{remove_invited_member(member.invitee_id,index)}}>Remove</Button>
+              </div>
               
-              <Input type="text" name="username"  placeholder="Enter username of the collaborator" ></Input>
-              {#if form?.usernotfound}
-              <span class="invalid"> No user found with this name </span>
-               {/if}
-               {#if form?.alreadycollab}
-               <span class="invalid"> Already is in the organizer's list </span>
-                {/if}
-              <div class="mt-6 flex items-center justify-start gap-x-6">
-                <Button type="submit" class="hover:invert" >+Add Collaborator</Button>
-                <!-- <button type="submit" class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white dark:text-black dark:bg-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Create</button> -->
-            </div>
-            </div>
-            
-        </div>
-        
-        
-      </form>
+              <Separator />
+          {/each}
+          <Button type="submit" class="w-full mt-5" on:click={org_invitation_dialog}> + Invite user</Button> 
+          
+
+      </div> 
+
       <Separator class="my-4  mx-6" /> 
 
     <!-- delete contest  -->
