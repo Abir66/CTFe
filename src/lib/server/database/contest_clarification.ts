@@ -72,7 +72,7 @@ async function get_clarifications(user_id,contest_id){
         join team_members on team_members.user_id = contest_threads.user_id
         join users on users.id = team_members.user_id
         and team_members.team_id = $1
-        and team_members.contest_id = $2
+        and contest_threads.contest_id = $2
     `;
     const params = [team_id,contest_id];
     let result = await Database.run_query(query, params);
