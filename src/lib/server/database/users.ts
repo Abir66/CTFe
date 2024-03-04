@@ -174,6 +174,29 @@ async function Number_of_problem_user_solved(user_id) {
    
     return result;
 }
+
+async function Number_of_blogs_user_wrote(user_id){
+    const qauery = `
+        select count(*) as count
+        from blogs
+        where user_id = $1
+    `
+    const params = [user_id];
+    let result = await Database.run_query(qauery, params);
+    return result;
+}
+
+async function user_created_blogs_list(user_id){
+    const query = `
+        select id, title, created_at,up_votes,down_votes
+        from blogs
+        where user_id = $1
+    `
+    const params = [user_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 export default 
 {
     is_registered_to_contest,
@@ -184,6 +207,8 @@ export default
     Number_of_contest_user_Participated_in,
     Number_of_contest_user_Organized,
     Number_of_problem_user_solved,
-    user_problem_stat_categorywise
+    user_problem_stat_categorywise,
+    Number_of_blogs_user_wrote,
+    user_created_blogs_list
 
 }
