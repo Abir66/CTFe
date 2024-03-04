@@ -27,7 +27,7 @@
                     <Card.Root class="mx-2  border-0">
                         <Card.Content>
                         <div class="prose prose-md dark:prose-invert">
-                            <MyMarkdown source={description} />
+                            <MyMarkdown source={description ? description : ''} />
                         </div>
                         </Card.Content>
                     </Card.Root>

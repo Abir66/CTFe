@@ -7,6 +7,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
+	
 </script>
 
 <div class="mx-auto flex w-full flex-col justify-center space-y-6 py-10 sm:w-[350px]">
