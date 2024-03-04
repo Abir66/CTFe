@@ -4,24 +4,34 @@
     import { Button } from '$lib/components/ui/button';
     import { Separator } from '$lib/components/ui/separator';
     import * as Select from "$lib/components/ui/select";
-     let selectedItem = "public";
+	import { log10 } from "chart.js/helpers";
+	import { enhance } from "$app/forms";
+     let selectedItem = "";
      export let form;
      export let data;
      let startdate;
-     let endtime;
-     let starttime;
-     let enddate;
-     $: console.log("hehe",data.contest_details);
-
-     $:   startdate = new Date(data.contest_details.start_time).toISOString().split('T')[0];
-
-     $:   enddate = new Date(data.contest_details.end_time).toISOString().split('T')[0];
-     $: starttime= new Date(data.contest_details.start_time).toISOString().split('T')[1].split('.')[0];
-     $: endtime= new Date(data.contest_details.end_time).toISOString().split('T')[1].split('.')[0];
-   </script>
+     let endtime ;
+     let starttime ;
+     let enddate ;
+     console.log("hehe",data.contest_details);
+    startdate = new Date(data.contest_details.start_time).toISOString().split('T')[0];
+     enddate = new Date(data.contest_details.end_time).toISOString().split('T')[0];
+     starttime= new Date(data.contest_details.start_time).toLocaleTimeString().split(':')[0]+":"+new Date(data.contest_details.start_time).toLocaleTimeString().split(':')[1]+" "+new Date(data.contest_details.start_time).toLocaleTimeString().split(' ')[1]  ;
+     endtime=new Date(data.contest_details.end_time).toLocaleTimeString().split(':')[0]+":"+new Date(data.contest_details.end_time).toLocaleTimeString().split(':')[1]+" "+new Date(data.contest_details.end_time).toLocaleTimeString().split(' ')[1];
+     $: console.log(starttime);
+     
+  </script>
    
    
-    <form  method="post" class="p-20" action="?/edit">  
+    <form  method="post" class="p-20" action="?/edit" use:enhance={({ formData }) => {
+      // Remove the unnecessary code block
+             if(formData.get('type')=="")
+             {
+                   formData.append('type',data.contest_details.type);
+             }
+             
+       
+    }}>  
         <div class="flex flex-row">
             <div class="flex flex-col lg:basis-1/2 space-y-6 basis-full ">
                 <Label for="title">Title</Label>
@@ -37,7 +47,7 @@
                         <Select.Item value="public"on:click={() => {selectedItem="public"}} >public</Select.Item>
                       </Select.Group>
                     </Select.Content>
-                    <Select.Input name="type" bind:value={data.contest_details.type} />
+                    <Select.Input name="type" />
                   </Select.Root>
                   {#if selectedItem === "private" || data.contest_details.type === "private"}
                   <Label for="password">Password</Label>

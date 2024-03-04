@@ -136,7 +136,7 @@
 
             <div class="flex flex-col space-y-5">
                 <div class="prose prose-lg dark:prose-invert py-5">
-                    <SvelteMarkdown source={challenge.description} />
+                    <SvelteMarkdown source={challenge.description? challenge.description : '' } />
                 </div>
 
                 {#if challenge.attachments && challenge.attachments.length > 0}

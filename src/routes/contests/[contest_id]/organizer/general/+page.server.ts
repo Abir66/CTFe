@@ -48,9 +48,9 @@ export const actions: Actions = {
         if(body.title=="" || body.description=="" || body.begindate=="" || body.begintime=="" || body.enddate=="" || body.endtime=="" || body.duration==""){
             return fail(400, {  emptyfields: true });
         }
-        else if (body.begindate<new Date().toISOString().split('T')[0]){
-			return fail(400, {  begindatebeforenow: true });
-		}
+        // else if (body.begindate<new Date().toISOString().split('T')[0]){
+		// 	return fail(400, {  begindatebeforenow: true });
+		// }
         else if (body.enddate<body.begindate) {
             return fail(400, {  enddatebeforebegindate: true });
         }
