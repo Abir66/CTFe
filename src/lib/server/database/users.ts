@@ -236,6 +236,51 @@ async function user_created_blogs_list(user_id){
     return result;
 }
 
+async function search_user_by_name_organizer(invite_string,contest_id) {
+    const query = `
+        select username,id
+        from users
+        where id not in (
+        select user_id from team_members
+        where contest_id = $1
+        union
+        select user_id from organizers
+        where contest_id = $1
+        union
+        select invitee_id from organizer_invites
+        where contest_id = $1
+        )
+        and username like '%' || $2 || '%'
+    `;
+    const params = [contest_id,invite_string];
+    let result = await Database.run_query(query, params);
+    console.log("IN Server:")
+    console.log(result);
+    return result;
+}
+
+async function invite_member(user_id,invitee_id,contest_id){
+    const query = `
+        INSERT INTO organizer_invites (inviter_id, invitee_id, contest_id)
+        VALUES ($1, $2,$3);
+    `
+    const params = [user_id,invitee_id,contest_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+async function get_invited_organizers(contest_id){
+    const query = `
+        select invitee_id,username
+        from organizer_invites
+        join users on organizer_invites.invitee_id = users.id
+        where contest_id = $1
+    `
+    const params = [contest_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 
 
 export default 
@@ -252,5 +297,8 @@ export default
     Number_of_blogs_user_wrote,
     user_created_blogs_list,
     get_organizer_invites,
-    remove_organizer_invite
+    remove_organizer_invite,
+    search_user_by_name_organizer,
+    invite_member,
+    get_invited_organizers
 }
