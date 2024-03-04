@@ -99,8 +99,44 @@ async function get_solves_for_organizer(contest_id, team='', username='', proble
 }
 
 
+async function get_flag_mismatch(contest_id, team='', username='', problem='', category='') {
+    let query = `
+        select 
+            s.id, s.user_id, s.team_id, s.flag, s.assigned_variation_id, s.time, s.submitted_variation_id,
+            u.username,
+            t.name as team_name,
+            cp.title, cp.category,
+            av.variation_name as assigned_variation_name,
+            sv.variation_name as submitted_variation_name,
+            t.status as team_status
+           
+        from flag_mismatch s
+        inner join users u on s.user_id = u.id
+        inner join teams t on t.id = s.team_id
+        inner join contest_problems cp on cp.id = s.problem_id
+        inner join problem_variations av on av.id =  s.assigned_variation_id
+        inner join problem_variations sv on sv.id =  s.submitted_variation_id
+        where s.contest_id = $1
+        and t.name ilike '%' || $2 || '%'
+        and u.username ilike '%' || $3 || '%'
+        and cp.title ilike '%' || $4 || '%'
+        and cp.category ilike '%' || $5 || '%'
+        order by s.id desc
+    `
+
+    console.log(query)
+
+
+    let params = [contest_id, team, username, problem, category]
+    let result = await Database.run_query(query, params)
+    return result
+}
+
+
+
 export default {
     check_submitted_flag,
     get_submissions_for_organizer,
-    get_solves_for_organizer
+    get_solves_for_organizer,
+    get_flag_mismatch
 }

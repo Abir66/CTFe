@@ -7,6 +7,7 @@
 	import { goto } from '$app/navigation';
 	import * as Popover from "$lib/components/ui/popover";
 	import * as Select from "$lib/components/ui/select";
+	import { toast } from "svelte-sonner";
 
 	function formatSubmissionTime(inputTime) {
 		const date = new Date(inputTime);
@@ -19,12 +20,41 @@
 		return `${month} ${day} ${year} ${hour}:${minute}:${second}`;
 	}
 
-	// import category from '$lib/categories';
+
 	import Categories from '$lib/categories';
+
+	async function ban_team(team_id, ban_team_status, team_name){
+
+		if(ban_team_status == 'banned') toast(`Banning Team ${team_name}`)
+		else toast(`Unbanning Team ${team_name}`)
+
+		const team_status = ban_team_status == 'banned' ? 'ban' : 'unban'			
+
+        const response = await fetch(`/api/contests/${data.contest_id}/organizer/set_team_ban`, {
+            method: 'POST',
+			body: JSON.stringify({team_id: team_id, team_status: team_status}),
+        })
+        const responseData = await response.json()
+        if(responseData.success) {
+            if(ban_team_status == 'banned') toast(`Team ${team_name} Banned Successfully`)
+			else toast(`Team ${team_name} Unbanned Successfully`)
+			data.submissions = data.submissions.map(team => {
+				if(team.team_id == team_id) team.team_status = ban_team_status
+				return team
+			})
+			
+        }
+        else {
+            if(responseData.message) toast(responseData.message )     
+            else toast("Something went wrong. Please try again.")
+        }
+    }
+
+
 
 </script>
 
-<form action="/contests/{data.contest_id}/organizer/submissions" method="GET" class="mb-5 flex flex-col items-center py-4 text-xl gap-y-5">
+<form action="/contests/{data.contest_id}/organizer/flag_mismatch" method="GET" class="mb-5 flex flex-col items-center py-4 text-xl gap-y-5">
 	
 	<div class="flex flex-col md:flex-row w-full justify-between md:space-x-5 space-y-5 md:space-y-0">
 		<div class="w-full">
@@ -59,7 +89,7 @@
 		<div class="w-full">
 			<Button type="submit">Search</Button>
 			{#if data.has_params}
-				<Button variant='outline' on:click={()=>{goto(`/contests/${data.contest_id}/organizer/submissions`)}}>Clear</Button>
+				<Button variant='outline' on:click={()=>{goto(`/contests/${data.contest_id}/organizer/flag_mismatch`)}}>Clear</Button>
 			{/if}
 		</div>
 	</div>
@@ -83,7 +113,7 @@
 			</Table.Header>
 			<Table.Body>
 				{#each data.submissions as submission (submission.id)}
-                    <Table.Row class="py-4">
+                    <Table.Row class="py-4 {submission.team_status == 'banned' ? 'bg-red-200 text-red-700 dark:bg-red-800 dark:text-red-100' : ''}">
                         <Table.Cell class="py-4 font-medium">{submission.team_name}</Table.Cell>
 						<Table.Cell class="py-4 font-medium">{submission.username}</Table.Cell>
                         <Table.Cell>{submission.title}</Table.Cell>
@@ -101,8 +131,22 @@
 									</div>
 
 									<div>
-										<div class="text-sm font-bold">Variation</div>
-										<div>{submission.variation_name}</div>
+										<div class="text-sm font-bold">Submitted Variation</div>
+										<div>{submission.submitted_variation_name}</div>
+									</div>
+
+									<div>
+										<div class="text-sm font-bold">Assigned Variation</div>
+										<div>{submission.assigned_variation_name}</div>
+									</div>
+
+									<div class="flex flex-col gap-y-2">
+										{#if submission.team_status == 'banned'}
+											<Button  type="submit" class="w-full" on:click={()=>{ban_team(submission.team_id, 'unban', submission.team_name)}} >Unban Team</Button>
+										{:else}
+											<Button  type="submit" class="w-full" on:click={()=>{ban_team(submission.team_id, 'banned', submission.team_name)}} >Ban Team</Button>
+										{/if}
+										
 									</div>
 
 								</div>

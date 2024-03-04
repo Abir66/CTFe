@@ -12,13 +12,13 @@ async function create_contest(title, begindate, enddate, type,password,maxmember
     return result;
 }
 
-async function update_contest(title, begindate, enddate, type,password,maxmember,contest_id) {
+async function update_contest(title, begindate, enddate, type,password,maxmember,contest_id, registration_paused) {
 
     const query = `
-        update contests set contest_name=$1,start_time=$2,end_time=$3,type=$4,contest_password=$5,memberlimit=$6 where id=$7
+        update contests set contest_name=$1,start_time=$2,end_time=$3,type=$4,contest_password=$5,memberlimit=$6,registration_paused=$8 where id=$7
     `;
 
-    const params = [title, begindate, enddate, type, password, maxmember, contest_id];
+    const params = [title, begindate, enddate, type, password, maxmember, contest_id, registration_paused];
     const result = await Database.run_query(query, params);
     console.log(result);
     

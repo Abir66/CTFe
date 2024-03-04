@@ -105,7 +105,7 @@
 					</Button>
 					
 					
-					{#if user}
+					{#if user && user!=null}
 					<Popover.Root bind:open={profile_popover_open}>
 						<Popover.Trigger>
 							<Avatar.Root class="border-primary border-2 hover:invert">
@@ -117,6 +117,7 @@
 							<div class="flex flex-col gap-y-2">
 								<Button variant="ghost" type="submit" class="w-full justify-start" on:click={() => {goto(`/user/${user['id']}`); profile_popover_open = false;}}>Profile</Button>
 								<Button variant="ghost" type="submit" class="w-full justify-start" on:click={() => {goto(`/team_invites`); profile_popover_open = false;}}>Team Invites</Button>
+								<Button variant="ghost" type="submit" class="w-full justify-start" on:click={() => {goto(`/organizer_invites`); profile_popover_open = false;}}>Organizer Invites</Button>
 								<div>
 									<form action="/auth/logout" method="POST" class="h-full w-full">
 										<Button variant="ghost" type="submit" class="w-full justify-start">Logout</Button>

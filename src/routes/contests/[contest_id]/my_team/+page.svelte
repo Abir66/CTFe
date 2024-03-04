@@ -17,10 +17,7 @@
    
     
     let delete_team_dialog_open = false;
-    let team_invitation_open = false;
-    function team_invitation_dialog() {
-        team_invitation_open = true;
-    }
+    
     function show_delete_team_dialog() {
         delete_team_dialog_open = true;
     }
@@ -113,6 +110,7 @@
 
     let team_member_error = '';
     async function remove_team_member(user_id){
+        toast('Removing member')
         team_member_error = '';
         const response = await fetch(`/api/team/${team_id}/remove_member`, {
             method: 'POST',
@@ -132,6 +130,7 @@
 
 
     async function remove_invited_member(user_id){
+        toast('Removing invitation')
         team_member_error = '';
         const response = await fetch(`/api/team/${team_id}/remove_invite`, {
             method: 'POST',
@@ -140,7 +139,7 @@
         const responseData = await response.json()
         console.log(responseData)
         if(responseData.success) {
-            toast('Member Removed Successfully')
+            toast('Team invitation removed successfully')
             invited_members = invited_members.filter(member => member.invitee_id != user_id)
         }
         else {
@@ -152,20 +151,41 @@
     let invite_string  = "";
     let timer;
     let invite_error = "";
-    $: users = [];
+
+    let users : any[] = [];
+    let team_invitation_open = false;
+    function team_invitation_dialog() {
+        users = [];
+        invite_string = ''
+        team_invitation_open = true;
+        invite_error = ''
+        
+    }
+    
     async function send_invitation(user_id,username){
         const response = await fetch(`/api/my_team/${team_id}/team_invite`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({invitee_id:user_id,contest_id:data.contest_id,inviter_id:$page.data.user.id})
+            body: JSON.stringify({invitee_id:user_id,contest_id:data.contest_id})
         })
         const responseData = await response.json()
+        console.log(responseData)
+        if(!responseData.success){
+            if(responseData.message) invite_error = responseData.message        
+            else toast("Something went wrong. Please try again.")
+        }
+
         invite_error = responseData.response.data[0].success;
-        if(invite_error == "success"){
+        if(responseData.response.data[0].success == "success"){
             invited_members.push({invitee_id:user_id,username:username});
             invited_members = invited_members;
+            // team_invitation_open = false;
+            users = [];
+            invite_string = ''
+            invite_error = ''
+            toast('Invitation sent successfully');
         }
     }
     async function handleInviteInput(event){
@@ -180,7 +200,6 @@
             fetch(`/api/my_team/${team_id}/team_invite?invite_string=${invite_string}&team_id=${team_id}&contest_id=${data.contest_id}`)
             .then(response => response.json())
             .then(data => {
-                // Store API response in result variable or process it as needed
                 let result = data;
                 if(result.response.data.length == 0){
                     invite_error = "No user found";

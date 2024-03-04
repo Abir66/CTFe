@@ -54,7 +54,7 @@ async function authorization({ event, resolve }) {
       throw redirect(303, '/')
   }
 
-  if(event.url.pathname.includes('/organizer')){
+  if(event.url.pathname.includes('/organizer') && event.params.contest_id){
     console.log(event.params)
     // if user is not logged in, redirect to login page
     if(!event.locals.user) throw redirect(303, '/auth/login')

@@ -245,6 +245,43 @@ async function remove_user_ban(user_id, contest_id){
     return result;
 }
 
+async function is_organizer(user_id, contest_id){
+    const query = `
+        SELECT EXISTS(
+            SELECT 1
+            FROM organizers
+            WHERE user_id = $1 AND contest_id = $2
+        ) as is_organizer;
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function organizer_invite_validity(user_id, contest_id){
+    const query = `
+        SELECT EXISTS(
+            SELECT 1
+            FROM organizer_invites
+            WHERE invitee_id = $1 AND contest_id = $2
+        ) as organizer_invite_validity;
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+
+async function add_organizer(user_id, contest_id){
+    const query = `
+        INSERT INTO organizers (user_id, contest_id)
+        VALUES ($1, $2);
+    `;
+    const params = [user_id, contest_id];
+    const result = await Database.run_query(query, params);
+    return result;
+}
+    
+
 
 export default {
     get_contest_list,
@@ -261,6 +298,9 @@ export default {
     update_contest_description,
     get_contest_status,
     get_banned_users,
-    remove_user_ban
+    remove_user_ban,
+    is_organizer,
+    organizer_invite_validity,
+    add_organizer
 }
 

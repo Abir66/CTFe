@@ -149,7 +149,6 @@ async function user_organized_contest_list(search_str, type, status,user_id) {
 
 async function user_solved_problems(user_id) {
 
-    
     const query = `
     select p.id, p.title , c.contest_name , p.category , s.created_at
     from contest_solves s 
@@ -175,6 +174,46 @@ async function Number_of_problem_user_solved(user_id) {
     return result;
 }
 
+async function get_organizer_invites(user_id){
+    const query = `
+        SELECT 
+            inviter.id AS inviter_id, 
+            inviter.username AS inviter_username, 
+            invitee.id AS invitee_id, 
+            invitee.username AS invitee_username,
+            oi.contest_id,
+            c.contest_name AS contest_name,
+            oi.created_at as invite_time
+        FROM 
+            organizer_invites oi
+        JOIN
+            contests c ON c.id = oi.contest_id
+        JOIN 
+            users inviter ON oi.inviter_id = inviter.id
+        JOIN 
+            users invitee ON oi.invitee_id = invitee.id
+        WHERE 
+            invitee_id = $1
+        ORDER BY 
+            oi.created_at DESC;
+    `
+    const params = [user_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
+
+async function remove_organizer_invite(user_id, contest_id){
+    const query = `
+        delete from organizer_invites
+        where contest_id = $1
+        and invitee_id = $2
+    `
+    const params = [contest_id, user_id];
+    let result = await Database.run_query(query, params);
+    return result;
+}
+
 async function Number_of_blogs_user_wrote(user_id){
     const qauery = `
         select count(*) as count
@@ -197,6 +236,8 @@ async function user_created_blogs_list(user_id){
     return result;
 }
 
+
+
 export default 
 {
     is_registered_to_contest,
@@ -209,6 +250,7 @@ export default
     Number_of_problem_user_solved,
     user_problem_stat_categorywise,
     Number_of_blogs_user_wrote,
-    user_created_blogs_list
-
+    user_created_blogs_list,
+    get_organizer_invites,
+    remove_organizer_invite
 }
