@@ -16,18 +16,18 @@
     let starttime;
     let enddate;
 
-    let registration_paused = data.contest_details.registration_paused;
-     
-    $: startdate = new Date(data.contest_details.start_time).toISOString().split('T')[0];
+  let registration_paused = data.contest_details.registration_paused;
+   
+  $: startdate = new Date(data.contest_details.start_time).toISOString().split('T')[0];
 
-    $: enddate = new Date(data.contest_details.end_time).toISOString().split('T')[0];
-    $: starttime= new Date(data.contest_details.start_time).toISOString().split('T')[1].split('.')[0];
-    $: endtime= new Date(data.contest_details.end_time).toISOString().split('T')[1].split('.')[0];
+  $: enddate = new Date(data.contest_details.end_time).toISOString().split('T')[0];
+  $: starttime= new Date(data.contest_details.start_time).toISOString().split('T')[1].split('.')[0];
+  $: endtime= new Date(data.contest_details.end_time).toISOString().split('T')[1].split('.')[0];
 
-    let delete_dialog_open = false;
-    function show_delete_dialog() {
-        delete_dialog_open = true;
-    }
+  let delete_dialog_open = false;
+  function show_delete_dialog() {
+      delete_dialog_open = true;
+  }
 
     let invite_string  = "";
     let timer;
@@ -242,33 +242,50 @@
         <div class="flex flex-col lg:basis-1/2 space-y-6 basis-full ">
             <p class="text-muted-foreground text-sm">Want to delete this contest? This action cannot be undone. All Data will be deleted</p>
             <div class="mt-6 flex items-center justify-start gap-x-6">
-                <Button variant="destructive" on:click={show_delete_dialog}>Delete Contest</Button>
-            </div>
-        </div>
-    </div>
+              <Button type="submit" class="hover:invert" >+Add Collaborator</Button>
+              <!-- <button type="submit" class="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white dark:text-black dark:bg-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Create</button> -->
+          </div>
+          </div>
+          
+      </div>
+      
+      
+    </form>
+    <Separator class="my-4  mx-6" /> 
 
-  
-  <Dialog.Root bind:open={delete_dialog_open} onOpenChange={(open) => {if (!open) {delete_dialog_open = false;}}}>
-        <Dialog.Content class="sm:max-w-[425px]">
-            <Dialog.Header>
-                <Dialog.Title>Delete Contest</Dialog.Title>
-            </Dialog.Header>
-            <Dialog.Description>
-                Are You sure you want to delete this contest? This action cannot be undone.
-            </Dialog.Description>
-            <Dialog.Footer>
-                <form use:enhance={()=>{toast('Deleting Contest...')}}  method="post" action="?/delete"> 
-                    <Button type="submit" variant="destructive">Yes, Delete</Button>
-                </form>
-            </Dialog.Footer>
-        </Dialog.Content>
-    </Dialog.Root>
-   
+  <!-- delete contest  -->
+  <h1 class="py-8 text-xl font-bold p-20"> Delete Contest</h1>
+  <div class="flex flex-row px-20">
+      <div class="flex flex-col lg:basis-1/2 space-y-6 basis-full ">
+          <p class="text-muted-foreground text-sm">Want to delete this contest? This action cannot be undone. All Data will be deleted</p>
+          <div class="mt-6 flex items-center justify-start gap-x-6">
+              <Button variant="destructive" on:click={show_delete_dialog}>Delete Contest</Button>
+          </div>
+      </div>
+  </div>
+
+
+<Dialog.Root bind:open={delete_dialog_open} onOpenChange={(open) => {if (!open) {delete_dialog_open = false;}}}>
+      <Dialog.Content class="sm:max-w-[425px]">
+          <Dialog.Header>
+              <Dialog.Title>Delete Contest</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Description>
+              Are You sure you want to delete this contest? This action cannot be undone.
+          </Dialog.Description>
+          <Dialog.Footer>
+              <form use:enhance={()=>{toast('Deleting Contest...')}}  method="post" action="?/delete"> 
+                  <Button type="submit" variant="destructive">Yes, Delete</Button>
+              </form>
+          </Dialog.Footer>
+      </Dialog.Content>
+  </Dialog.Root>
+ 
 <style>
-    .invalid {
-       color: red;
-    }
-   
+  .invalid {
+     color: red;
+  }
+ 
 </style>
-   
-   
+ 
+ 
