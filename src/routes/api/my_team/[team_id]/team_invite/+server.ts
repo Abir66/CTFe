@@ -9,8 +9,22 @@ export async function GET({ locals,params,url  }) {
 }
 
 export async function POST({locals,params,request}) {
+
+    if(!locals.user) {
+        return json({success: false, message: "Not logged in"});
+    }
+
     const data = await request.json();
-    const response = await Teams.invite_member(data.inviter_id,data.invitee_id,data.contest_id);  
+
+    if(!data.invitee_id) {
+        return json({success: false, message: "Invitee id not provided"});
+    }
+
+    if(!data.contest_id) {
+        return json({success: false, message: "Contest id not provided"});
+    }
+
+    const response = await Teams.invite_member(locals.user.id,data.invitee_id,data.contest_id);  
     console.log("response",response); 
     return json({ success: true,response: response})
 }

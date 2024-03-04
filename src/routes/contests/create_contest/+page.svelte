@@ -1,8 +1,10 @@
 <script lang="ts">
- import { Input } from "$lib/components/ui/input";
- import { Label } from "$lib/components/ui/label";
- import { Button } from '$lib/components/ui/button';
- import * as Select from "$lib/components/ui/select";
+  import { Input } from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import { Button } from '$lib/components/ui/button';
+  import * as Select from "$lib/components/ui/select";
+  import { enhance } from '$app/forms';
+  import { toast } from "svelte-sonner";
   let selectedItem = "public";
   export let form;
 </script>
@@ -10,8 +12,7 @@
 
 <h1 class="py-12 text-xl font-bold text-center"> Create Contest</h1> 
 
-<form  method="post" >
-     
+<form use:enhance={()=>{toast('Creating Contest...'); if(form && form.emptyfields) form.emptyfields=false}}  method="post" >
     <div class="flex flex-row justify-center ">
         <div class="flex flex-col lg:basis-1/2 space-y-6 basis-full ">
             <Label for="title">Title</Label>

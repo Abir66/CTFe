@@ -37,6 +37,6 @@
         </Card.Root>
     {/each}
 {:else}
-        <h1 class="w-full font-bold text-2xl text-center">Create a thread</h1>
+    <h1 class="w-full font-bold text-2xl text-center">No Clarifications</h1>
 
 {/if}
