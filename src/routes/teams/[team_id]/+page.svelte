@@ -5,6 +5,9 @@
     import * as d3 from "d3";
     import { Gear } from 'radix-icons-svelte'
     import { Button } from '$lib/components/ui/button';
+    import {Exit} from 'radix-icons-svelte'
+    import * as Dialog from "$lib/components/ui/dialog";
+    import { toast } from "svelte-sonner";
 
 
     export let data;
@@ -40,7 +43,52 @@
     const arc_verdict = d3.arc().innerRadius(radius * 0.5).outerRadius(radius * 0.8);
     const outerArc_verdict = d3.arc().innerRadius(radius * 0.9).outerRadius(radius * 0.9);
 
+
+    let leave_team_dialog_open = false;
+    
+
+    let leave_team_error = '';
+    async function leave_team(){
+        toast('Leaving the team...')
+        leave_team_error  = '';
+        const response = await fetch(`/api/team/${team_id}/leave`, {
+            method: 'POST',
+        })
+        const responseData = await response.json()
+        if(responseData.success) {
+            toast('You have left the team successfully.')
+            leave_team_dialog_open = false;
+            location.reload();
+        }
+        else {
+            if(responseData.message) leave_team_error  = responseData.message        
+            else toast("Something went wrong. Please try again.")
+        }
+    }
+
+
+
 </script>
+
+
+<Dialog.Root bind:open={leave_team_dialog_open} onOpenChange={(open) => {if (!open) {leave_team_dialog_open = false;}}}>
+    <Dialog.Content class="sm:max-w-[425px]">
+        <Dialog.Header>
+            <Dialog.Title>Leave Team</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Description>
+            Are You sure you want to leave this team?
+        </Dialog.Description>
+           {#if leave_team_error }
+                <p class="text-red-500">{leave_team_error }</p>
+            {/if}
+        <Dialog.Footer>
+            <Button type="submit" variant="destructive" on:click={leave_team} >Yes, Leave</Button>
+        </Dialog.Footer>
+    </Dialog.Content>
+</Dialog.Root>
+
+
 
 {#if data.team_info.status == 'banned'}
     <div class="p-5  bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-100 rounded-md">This team was banned from the contest</div>
@@ -52,7 +100,10 @@
         <h1 class="text-3xl font-bold mb-5">{data.team_info.name.toUpperCase()}</h1>
         {#if data.is_leader}
             <Button variant="ghost" on:click={()=>{goto(`/contests/${contest_id}/my_team`)}}><Gear class="scale-150"/></Button>
-        {/if}    
+        {/if} 
+        {#if data.is_member && !data.is_leader }
+            <Button variant="ghost" on:click={()=>{leave_team_dialog_open = true}}><Exit class="scale-150"/></Button>
+        {/if}   
     </div>
     <Table.Root class="lg:text-lg">
         <Table.Header>

@@ -174,16 +174,16 @@
 <Dialog.Root bind:open={ban_team_dialog_open} onOpenChange={(open) => {if (!open) {ban_team_dialog_open = false;}}}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>{ban_team_status.charAt(0).toUpperCase() + ban_team_status.slice(1)} Team</Dialog.Title>
+            <Dialog.Title>{ban_team_status.charAt(0).toUpperCase() + ban_team_status.slice(1, -3)} Team</Dialog.Title>
         </Dialog.Header>
         <Dialog.Description>
-            Are You sure you want to {ban_team_status} the team - <span class="font-bold text-primary">{delete_team_name}</span>?
+            Are You sure you want to {ban_team_status == 'banned' ? 'ban' : 'unban'} the team - <span class="font-bold text-primary">{delete_team_name}</span>?
         </Dialog.Description>
            {#if ban_team_error}
                 <p class="text-red-500">{ban_team_error}</p>
             {/if}
         <Dialog.Footer>
-            <Button type="submit" variant="destructive" on:click={ban_team} >Yes, {ban_team_status}</Button>
+            <Button type="submit" variant="destructive" on:click={ban_team} >Yes, {ban_team_status == 'banned' ? 'Ban' : 'Unban'}</Button>
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>

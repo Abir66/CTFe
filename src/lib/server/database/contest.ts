@@ -280,7 +280,9 @@ async function add_organizer(user_id, contest_id){
     const result = await Database.run_query(query, params);
     return result;
 }
-    
+
+
+
 
 
 export default {

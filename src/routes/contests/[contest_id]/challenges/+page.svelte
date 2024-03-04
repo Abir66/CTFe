@@ -14,7 +14,6 @@
 	}
 
 
-	
 </script>
 
 {#if dialogueOpen}
@@ -31,6 +30,16 @@
 	</Dialog.Root>
 {/if}
 
+{#if data.contest_paused}
+	<div class="flex justify-center items-center h-96">
+		<h1 class="text-3xl font-bold">Contest Paused</h1>
+	</div>
+
+{:else if data.challenge_list.length == 0}
+	<div class="flex justify-center items-center h-96">
+		<h1 class="text-3xl font-bold">No challenges available</h1>
+	</div>
+{/if}
 
 {#each data.challenge_list as section (section)}
 	<div class="mb-20">

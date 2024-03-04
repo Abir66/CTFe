@@ -59,14 +59,14 @@ async function get_problem_access(problem_id, user_id){
     return result;
 }
 
-async function get_problem(problem_id, user_id){
-    const query = `SELECT get_problem($1, $2) as problem;`;
-    const params = [problem_id, user_id];
+async function get_problem(problem_id, user_id, variation_id=0){
+    const query = `SELECT get_problem2($1, $2, $3) as problem;`;
+    const params = [problem_id, user_id, variation_id];
     let result = await Database.run_query(query, params);
     return result;
 }
 
-async function submit_flag(problem_id, user_id, flag, variation_id = -1){
+async function submit_flag(problem_id, user_id, flag, variation_id = 0){
     const query = `
         SELECT submit_flag($1, $2, $3, $4) as submit_response;
     `;
