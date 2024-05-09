@@ -20,7 +20,7 @@
 	}
 
 	async function submitSearch(){
-		goto(`/contests/${data.contest_id}/scoreboard?search_team_name=${search_team_name}&show_banned=${show_banned}`);
+		goto(`/contests/${data.contest_id}/standings?search_team_name=${search_team_name}&show_banned=${show_banned}`);
 	}
 
 	async function clear(){
@@ -30,7 +30,7 @@
 	
 </script>
 
-<form action="/contests/{data.contest_id}/scoreboard" method="GET" class="mb-5 w-full flex flex-col gap-y-5 lg:flex-row lg:gap-y-0 lg:justify-between py-4 text-xl" on:submit|preventDefault={submitSearch}>
+<form action="/contests/{data.contest_id}/standings" method="GET" class="mb-5 w-full flex flex-col gap-y-5 lg:flex-row lg:gap-y-0 lg:justify-between py-4 text-xl" on:submit|preventDefault={submitSearch}>
 	<div class="w-full flex gap-x-5">
 		<div class="w-3/4">
 			<Input name="search_team_name" class="w-full" placeholder="Search team by name" type="text" bind:value={search_team_name} />
