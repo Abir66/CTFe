@@ -1,4 +1,5 @@
 
+import { run_query } from '$lib/server/database/database';
 import Contest from '$lib/server/database/contest'
 import { error } from '@sveltejs/kit';
 import { fail } from '@sveltejs/kit';
@@ -68,7 +69,7 @@ export const actions: Actions = {
 
 	},
 
-	delete: async ({ request, url, params, locals: { supabase } }) => {
+	delete: async ({ request, url, params }) => {
 
 		const formdata = await request.formData();
 		const body = Object.fromEntries(formdata);
@@ -82,7 +83,7 @@ export const actions: Actions = {
 
 	},
 
-	addcollab: async ({ request, url, params, locals: { supabase } }) => {
+	addcollab: async ({ request, url, params }) => {
 
 
 		// console.log(new Date().toLocaleString());
@@ -92,16 +93,18 @@ export const actions: Actions = {
 		const body = Object.fromEntries(formdata);
 		console.log(body);
 
-		let result = await supabase.from('users').select('id').eq('username', body.username);
+		let result = await run_query('SELECT id FROM users WHERE username = $1', [body.username]);
+		if (!result.success) {
+			return fail(500, { usernotfound: false, alreadycollab: false });
+		}
 		if (result.data.length == 0) {
 			return fail(400, { usernotfound: true });
 		}
 
 		else {
-			let result2 = await supabase.from('organizers').insert([{ contest_id: params.contest_id, user_id: result.data[0].id }]);
-			console.log(result2);
+			let result2 = await run_query('INSERT INTO organizers (contest_id, user_id) VALUES ($1, $2)', [params.contest_id, result.data[0].id]);
 
-			if (result2.error) {
+			if (!result2.success) {
 				return fail(400, { alreadycollab: true });
 			}
 			else {

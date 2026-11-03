@@ -8,13 +8,14 @@ import { fail } from '@sveltejs/kit';
 import { BlobSASPermissions, BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import crypto from 'crypto';
 import categories from '$lib/categories';
+import { run_query } from '$lib/server/database/database';
 
-export const load = async ({url,params,locals:{supabase}}) => {
+export const load = async ({url,params}) => {
   
     
     const  problem_id = params.problem_id;
     const contest_id = params.contest_id;
-    const problems = await supabase.from('contest_problems').select("*").eq('contest_id',contest_id);
+    const problems = await run_query('SELECT * FROM contest_problems WHERE contest_id = $1', [contest_id]);
 	// console.log("hehe\n");
 	
 	// 
@@ -25,7 +26,7 @@ export const load = async ({url,params,locals:{supabase}}) => {
 
     //get the problem details
 
-    let res = await supabase.from('contest_problems').select("*").eq('id',problem_id);
+    let res = await run_query('SELECT * FROM contest_problems WHERE id = $1', [problem_id]);
     console.log(res);
     if(res.error){
         console.error(res.error);
@@ -35,7 +36,7 @@ export const load = async ({url,params,locals:{supabase}}) => {
    
     //get the hints
 
-    let res1 = await supabase.from('hints').select("*").eq('problem_id',problem_id);
+    let res1 = await run_query('SELECT * FROM hints WHERE problem_id = $1', [problem_id]);
     console.log(res1);
     if(res1.error){
         console.error(res1.error);
@@ -54,7 +55,6 @@ export const load = async ({url,params,locals:{supabase}}) => {
 
     // get problem variations
 
-    // let res3 = await supabase.from('problem_variations').select("*").eq('problem_id',problem_id);
     //  console.log(res3);
 	let res3 = await organizer.get_variations(problem_id);
 	console.log(res3);

@@ -1,6 +1,8 @@
 import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
+import { run_query } from '$lib/server/database/database';
+import { create_session, hash_password } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -19,7 +21,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, url, locals: { supabase } }) => {
+	default: async ({ request, cookies }) => {
 		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
 		
@@ -32,13 +34,9 @@ export const actions: Actions = {
 		// TODO: Do something with the validated data
 		const {username, email, password} = form.data;
 
-		const dupEmailCheck = await supabase
-			.from('users')
-			.select("email")
-			.eq('email', email)
+		const dupEmailCheck = await run_query('SELECT 1 FROM users WHERE email = $1', [email]);
 
-
-		if(dupEmailCheck.error){
+		if(!dupEmailCheck.success){
 			return fail(500, { form });
 		}
 
@@ -46,13 +44,9 @@ export const actions: Actions = {
 			return setError(form, 'email', 'E-mail already exists.');
 		}
 
-		const dupUsernameCheck = await supabase
-			.from('users')
-			.select("username")
-			.eq('username', username)
+		const dupUsernameCheck = await run_query('SELECT 1 FROM users WHERE username = $1', [username]);
 
-		
-		if(dupUsernameCheck.error){
+		if(!dupUsernameCheck.success){
 			return fail(500, { form });
 		}
 
@@ -61,19 +55,25 @@ export const actions: Actions = {
 		}
 
 		
-		let signupResponse = await supabase.auth.signUp({
-			email,
-			password,
-			options: {
-				emailRedirectTo: `${url.origin}/auth/callback`,
-				data: { username },
-			},
-		})
+		const password_hash = await hash_password(password);
+		const insertResponse = await run_query(
+			'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
+			[username, email, password_hash]
+		);
 
-		if (signupResponse.error) {
+		if (!insertResponse.success) {
+			// unique violation from a concurrent registration
+			if ((insertResponse.error as any)?.code === '23505') {
+				return setError(form, 'email', 'E-mail or username already exists.');
+			}
 			return fail(500, { form });
 		}
-		
-		throw redirect(303, '/auth/verifyEmail')
+
+		const session = await create_session(cookies, insertResponse.data[0].id);
+		if (!session.success) {
+			return fail(500, { form });
+		}
+
+		throw redirect(303, '/')
 	}
 };
