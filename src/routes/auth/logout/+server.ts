@@ -1,12 +1,8 @@
-import { error, redirect } from "@sveltejs/kit"
+import { redirect } from "@sveltejs/kit"
 import type { RequestHandler } from "./$types"
+import { delete_session } from "$lib/server/auth"
 
-export const POST: RequestHandler = async ({ locals }) => {
-	const { error: err } = await locals.supabase.auth.signOut()
-
-	if (err) {
-		throw error(500, "Something went wrong logging you out.")
-	}
-
+export const POST: RequestHandler = async ({ cookies }) => {
+	await delete_session(cookies)
 	throw redirect(303, "/")
 }

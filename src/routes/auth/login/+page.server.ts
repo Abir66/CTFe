@@ -1,6 +1,8 @@
-import {  message, superValidate } from 'sveltekit-superforms/server';
+import {  message, setError, superValidate } from 'sveltekit-superforms/server';
 import { fail } from '@sveltejs/kit';
 import { z } from 'zod';
+import { run_query } from '$lib/server/database/database';
+import { create_session, verify_password } from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -18,7 +20,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, url, locals: { supabase } }) => {
+	default: async ({ request, cookies }) => {
 		// Use superValidate in form actions too, but with the request
 		const form = await superValidate(request, schema);
 
@@ -34,13 +36,20 @@ export const actions: Actions = {
 		const email = form.data.email;
 		const password = form.data.password;
 		
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email,
-			password
-		})
+		const result = await run_query('SELECT id, password_hash FROM users WHERE email = $1', [email]);
+		if (!result.success) {
+			console.error('error', result.error);
+			return fail(500, { form });
+		}
 
-		if (error) {
-			console.error('error', error);
+		const user = result.data[0];
+		if (!user || !(await verify_password(password, user.password_hash))) {
+			return setError(form, 'password', 'Invalid e-mail or password.');
+		}
+
+		const session = await create_session(cookies, user.id);
+		if (!session.success) {
+			console.error('error', session.error);
 			return fail(500, { form });
 		}
 

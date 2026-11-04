@@ -5,12 +5,13 @@ import { fail } from '@sveltejs/kit';
 import { BlobSASPermissions, BlobServiceClient, BlockBlobClient } from '@azure/storage-blob';
 import crypto from 'crypto';
 import categories from '$lib/categories';
+import { run_query } from '$lib/server/database/database';
 
 
-export const load = async ({params, locals:{supabase}}) => {
+export const load = async ({params}) => {
 	
 	const contest_id = params.contest_id;
-	const problems = await supabase.from('contest_problems').select("*").eq('contest_id',contest_id);
+	const problems = await run_query('SELECT * FROM contest_problems WHERE contest_id = $1', [contest_id]);
 	// console.log("hehe\n");
 	
 	// 

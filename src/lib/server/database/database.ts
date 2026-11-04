@@ -1,12 +1,19 @@
 import pg from 'pg'
-import { db_host, db_port, db_user, db_password, db_database } from '$env/static/private';
+import { env } from '$env/dynamic/private';
+
+// Hosted Postgres (Supabase, Neon, Render, ...) requires SSL; local does not.
+// Override with DATABASE_SSL=true|false if needed.
+function use_ssl(url: string) {
+  if (env.DATABASE_SSL) return env.DATABASE_SSL === 'true';
+  const host = new URL(url).hostname;
+  return !['localhost', '127.0.0.1', '::1'].includes(host);
+}
+
+if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 
 const pool = new pg.Pool({
-  user: db_user,
-  host: db_host,
-  database: db_database,
-  password: db_password,
-  port: db_port,
+  connectionString: env.DATABASE_URL,
+  ssl: use_ssl(env.DATABASE_URL) ? { rejectUnauthorized: false } : false,
 });
 
 
@@ -28,4 +35,3 @@ export const run_query = async function(query, params) {
 export default{
     run_query
 }
-

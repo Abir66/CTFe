@@ -14,6 +14,15 @@ npm create svelte@latest
 npm create svelte@latest my-app
 ```
 
+## Database setup
+
+The app needs any PostgreSQL 15+ database (local, Supabase, Neon, Render, ...).
+
+```bash
+cp .env.example .env          # set DATABASE_URL
+npm run db:setup              # runs db/*.sql in order on an empty database
+```
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
